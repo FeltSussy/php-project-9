@@ -1,0 +1,6 @@
+parameters:
+    level: 5
+    ignoreErrors:
+        -
+            message: '#Undefined variable: \$this#'
+            path: public/index.php

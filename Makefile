@@ -9,4 +9,4 @@ lint:
 	composer exec --verbose phpcs -- --standard=PSR12 public
 
 phpstan:
-	composer exec --verbose phpstan analyse -- public
+	composer exec --verbose phpstan analyse -- -c phpstan.neon public
