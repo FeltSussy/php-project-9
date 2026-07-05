@@ -11,12 +11,25 @@ $container = new Container();
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
 });
+$container->set('flash', function() {
+    return new \Slim\Flash\Messages();
+});
+
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 $router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) {
-    return $this->get('renderer')->render($response, 'main.phtml');
+    $messages = $this->get('flash')->getMessages();
+    $params = [
+        'flash' => $messages
+    ];
+    return $this->get('renderer')->render($response, 'layout.phtml', $params);
+});
+
+$app->post('/test', function ($request, $response) {
+    $this->get('flash')->addMessage('success', 'Добавленный flash');
+    return $response->withRedirect("/", 302);
 });
 
 $app->run();
