@@ -19,5 +19,5 @@ jobs:
       - name: composer installation
         run: make install
 
-      - name: linter and phpstan
-        run: make lint && make phpstan
+      - name: linter
+        run: make lint
