@@ -63,6 +63,9 @@ $app->get('/sites/new', [SiteController::class, 'create'])
 $app->post('/sites', [SiteController::class, 'store'])
     ->setName('sites');
 
+$app->get('/sites', [SiteController::class, 'index'])
+    ->setName('sites.index');
+
 $app->run();
 
 

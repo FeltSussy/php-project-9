@@ -38,7 +38,17 @@ class SiteController
     {
         $params = [
             'flash' => $this->messages->getMessages(),
-            'content' => $this->renderer->fetch('main.phtml', []),
+            'content' => $this->renderer->fetch('sites/new.phtml', []),
+        ];
+        return $this->renderer->render($response, 'layout.phtml', $params);
+    }
+
+    public function index (ServerRequestInterface $request, ResponseInterface $response)
+    {
+        
+        $params = [
+            'sites' => 'test',
+            'content' => $this->renderer->fetch('sites/index.phtml', []),
         ];
         return $this->renderer->render($response, 'layout.phtml', $params);
     }

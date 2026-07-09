@@ -24,7 +24,7 @@
     </nav>
     <main class="container flex-grow-1">
         <!-- flash -->
-        <?php if (count($flash) > 0) : ?>
+        <?php if (isset($flash) && count($flash) > 0) : ?>
             <?php foreach ($flash as $messages) : ?>
                 <?php foreach ($messages as $message) : ?>
                     <div class="alert alert-success" role="alert">
