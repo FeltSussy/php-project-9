@@ -3,35 +3,35 @@
 namespace App\Controller;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Interfaces\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Views\PhpRenderer;
 use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
-use PDO;
+use App\Service\SiteRegistrationService;
 
 class SiteController
 {
     private PhpRenderer $renderer;
     private Messages $messages;
     private RouteParser $routeParser;
-    private PDO $pdo;
+    private SiteRegistrationService $service;
 
     public function __construct(
         PhpRenderer $renderer,
         Messages $messages,
         RouteParser $routeParser,
-        PDO $pdo
+        SiteRegistrationService $service
     )
     {
         $this->renderer = $renderer;
         $this->messages = $messages;
         $this->routeParser = $routeParser;
-        $this->pdo = $pdo;
+        $this->service = $service;
     }
 
     public function home (ServerRequestInterface $request, ResponseInterface $response)
     {
-        return $response->withRedirect($this->routeParser->urlFor('sites.new'), 302);
+        return $response->withHeader('Location', $this->routeParser->urlFor('sites.new'))->withStatus(302);
     }
 
     public function create (ServerRequestInterface $request, ResponseInterface $response)
@@ -55,6 +55,7 @@ class SiteController
 
     public function store (ServerRequestInterface $request, ResponseInterface $response)
     {
-        
+        $site = $request->getParsedBody();
+        $result = $this->service->add($site['url']);
     }
 }
