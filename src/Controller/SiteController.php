@@ -7,22 +7,26 @@ use Slim\Http\Interfaces\ResponseInterface;
 use Slim\Views\PhpRenderer;
 use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
+use PDO;
 
 class SiteController
 {
     private PhpRenderer $renderer;
     private Messages $messages;
     private RouteParser $routeParser;
+    private PDO $pdo;
 
     public function __construct(
         PhpRenderer $renderer,
         Messages $messages,
-        RouteParser $routeParser
+        RouteParser $routeParser,
+        PDO $pdo
     )
     {
         $this->renderer = $renderer;
         $this->messages = $messages;
         $this->routeParser = $routeParser;
+        $this->pdo = $pdo;
     }
 
     public function home (ServerRequestInterface $request, ResponseInterface $response)
@@ -41,7 +45,6 @@ class SiteController
 
     public function store (ServerRequestInterface $request, ResponseInterface $response)
     {
-        $this->messages->addMessage('success', 'Добавленный flash');
-        return $response->withRedirect($this->routeParser->urlFor('sites.new'), 302);
+        
     }
 }
