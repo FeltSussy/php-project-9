@@ -57,5 +57,6 @@ class SiteController
     {
         $site = $request->getParsedBody();
         $result = $this->service->add($site['url']);
+        
     }
 }
