@@ -17,14 +17,14 @@ class Site
         $this->createdAt = $createdAt;
     }
 
-    public static function create (string $name, DateTimeInterface $createdAt)
+    public static function create(string $name, DateTimeInterface $createdAt)
     {
-        return new Site (null, $name, $createdAt);
+        return new Site(null, $name, $createdAt);
     }
 
-    public static function createFromDatabase (int $id, string $name, DateTimeInterface $createdAt)
+    public static function createFromDatabase(int $id, string $name, DateTimeInterface $createdAt)
     {
-        return new Site ($id, $name, $createdAt);
+        return new Site($id, $name, $createdAt);
     }
 
     public function getId(): int

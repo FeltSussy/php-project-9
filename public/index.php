@@ -34,15 +34,16 @@ $container->set(Messages::class, function () {
 });
 $container->set(PDO::class, function () use ($databaseUrl) {
     return new PDO(
-    sprintf(
-        'pgsql:host=%s;port=%d;dbname=%s',
-        $databaseUrl['host'],
-        $databaseUrl['port'] ?? 5432,
-        ltrim($databaseUrl['path'], '/')
-    ),
-    $databaseUrl['user'],
-    $databaseUrl['pass'],
-    [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+        sprintf(
+            'pgsql:host=%s;port=%d;dbname=%s',
+            $databaseUrl['host'],
+            $databaseUrl['port'] ?? 5432,
+            ltrim($databaseUrl['path'], '/')
+        ),
+        $databaseUrl['user'],
+        $databaseUrl['pass'],
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
 });
 
 /**
@@ -65,6 +66,9 @@ $app->post('/sites', [SiteController::class, 'store'])
 
 $app->get('/sites', [SiteController::class, 'index'])
     ->setName('sites.index');
+
+$app->get('/sites/{id}', [SiteController::class, 'show'])
+    ->setName('sites.id');
 
 $app->run();
 

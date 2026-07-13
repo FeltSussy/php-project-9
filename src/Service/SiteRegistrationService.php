@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-require __DIR__ . '/../../vendor/autoload.php';
-
 use App\Repository\SiteRepository;
 use Valitron\Validator;
 use App\Entity\Site;
@@ -15,12 +13,11 @@ class SiteRegistrationService
 
     public function __construct(
         SiteRepository $repository
-    )
-    {
+    ) {
         $this->repository = $repository;
     }
 
-    public function add (string $url)
+    public function add(string $url)
     {
         $validator = new Validator(['website' => $url]);
         $validator->rules([
@@ -30,8 +27,9 @@ class SiteRegistrationService
         ]);
         if (!$validator->validate()) {
             return [
-                'success' => false,
+                'key' => 'warning',
                 'message' => 'URL не должен быть пустым',
+                'siteId' => null,
             ];
         }
 
@@ -42,8 +40,9 @@ class SiteRegistrationService
         ]);
         if (!$validator->validate()) {
             return [
-                'success' => false,
+                'key' => 'warning',
                 'message' => 'Некорректный URL',
+                'siteId' => null,
             ];
         }
 
@@ -54,8 +53,9 @@ class SiteRegistrationService
         ]);
         if (!$validator->validate()) {
             return [
-                'success' => false,
+                'key' => 'warning',
                 'message' => 'URL превышает 255 символов',
+                'siteId' => null,
             ];
         }
 
@@ -67,5 +67,3 @@ class SiteRegistrationService
         return $result;
     }
 }
-
-var_dump(Carbon::now());
