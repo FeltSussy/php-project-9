@@ -2,68 +2,68 @@
 
 namespace App\Service;
 
-use App\Repository\SiteRepository;
+use App\Repository\UrlRepository;
 use Valitron\Validator;
-use App\Entity\Site;
+use App\Entity\Url;
 use Carbon\Carbon;
 
-class SiteRegistrationService
+class UrlRegistrationService
 {
-    private SiteRepository $repository;
+    private UrlRepository $repository;
 
     public function __construct(
-        SiteRepository $repository
+        UrlRepository $repository
     ) {
         $this->repository = $repository;
     }
 
-    public function add(string $url)
+    public function add(string $name)
     {
-        $validator = new Validator(['website' => $url]);
+        $validator = new Validator(['urlName' => $name]);
         $validator->rules([
             'required' => [
-                ['website']
+                ['urlName']
             ]
         ]);
         if (!$validator->validate()) {
             return [
                 'key' => 'warning',
                 'message' => 'URL не должен быть пустым',
-                'siteId' => null,
+                'urlId' => null,
             ];
         }
 
         $validator->rules([
             'url' => [
-                ['website']
+                ['urlName']
             ]
         ]);
         if (!$validator->validate()) {
             return [
                 'key' => 'warning',
                 'message' => 'Некорректный URL',
-                'siteId' => null,
+                'urlId' => null,
             ];
         }
 
         $validator->rules([
             'lengthMax' => [
-                ['website', 255]
+                ['urlName', 255]
             ]
         ]);
         if (!$validator->validate()) {
             return [
                 'key' => 'warning',
                 'message' => 'URL превышает 255 символов',
-                'siteId' => null,
+                'urlId' => null,
             ];
         }
 
-        $parsedUrl = parse_url($url);
-        $urlToSave = "{$parsedUrl['scheme']}://{$parsedUrl['host']}";
+        $parsedUrlName = parse_url($name);
+        $urlNameToSave = "{$parsedUrlName['scheme']}://{$parsedUrlName['host']}";
 
-        $site = Site::create($urlToSave, Carbon::now());
-        $result = $this->repository->save($site);
+        $url = Url::create($urlNameToSave, Carbon::now());
+        $result = $this->repository->save($url);
         return $result;
     }
 }

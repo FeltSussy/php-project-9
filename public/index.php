@@ -5,7 +5,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 use App\Controller\ {
-    SiteController
+    UrlController
 };
 use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
@@ -55,20 +55,20 @@ $container->set(RouteParser::class, function () use ($app) {
     return $app->getRouteCollector()->getRouteParser();
 });
 
-$app->get('/', [SiteController::class, 'home'])
+$app->get('/', [UrlController::class, 'home'])
     ->setName('root');
 
-$app->get('/sites/new', [SiteController::class, 'create'])
-    ->setName('sites.new');
+$app->get('/urls/new', [UrlController::class, 'create'])
+    ->setName('urls.new');
 
-$app->post('/sites', [SiteController::class, 'store'])
-    ->setName('sites');
+$app->post('/urls', [UrlController::class, 'store'])
+    ->setName('urls');
 
-$app->get('/sites', [SiteController::class, 'index'])
-    ->setName('sites.index');
+$app->get('/urls', [UrlController::class, 'index'])
+    ->setName('urls.index');
 
-$app->get('/sites/{id}', [SiteController::class, 'show'])
-    ->setName('sites.id');
+$app->get('/urls/{id}', [UrlController::class, 'show'])
+    ->setName('urls.id');
 
 $app->run();
 

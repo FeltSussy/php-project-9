@@ -9,12 +9,12 @@
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($sites as $site) : ?>
+        <?php foreach ($urls as $url) : ?>
         <tr>
-            <th scope="row"><?= $site->getId() ?></th>
+            <th scope="row"><?= $url->getId() ?></th>
             <td>
-                <a href="/sites/<?= $site->getId() ?>">
-                    <?= htmlspecialchars($site->getName()) ?>
+                <a href="/urls/<?= $url->getId() ?>">
+                    <?= htmlspecialchars($url->getName()) ?>
                 </a>
             </td>
             <td></td>

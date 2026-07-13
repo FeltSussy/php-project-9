@@ -1,24 +1,27 @@
-<h1 class="display-5">Сайт: <?= htmlspecialchars($site->getName()) ?></h1>
+<h1 class="display-5">Сайт: <?= htmlspecialchars($url->getName()) ?></h1>
 <table class="table table-bordered" data-test="url">
     <thead>
         <tr>
             <th scope="col">ID</th>
-            <th scope="col"><?= htmlspecialchars($site->getId()) ?></th>
+            <th scope="col"><?= htmlspecialchars($url->getId()) ?></th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <th scope="row">Имя</th>
-            <td><?= htmlspecialchars($site->getName()) ?></td>
+            <td><?= htmlspecialchars($url->getName()) ?></td>
         </tr>
         <tr>
             <th scope="row">Дата создания</th>
-            <td><?= htmlspecialchars($site->getCreatedAt()->format('Y-m-d')) ?></td>
+            <td><?= htmlspecialchars($url->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
         </tr>
     </tbody>
 </table>
 <br>
 <h1 class="display-5">Проверки</h1>
+<form method="post" action="/urls/1/checks"> <?= $routeParser->urlFor('urls.checks') ?>
+    <input type="submit" value="Запустить проверку">
+</form>
 <table class="table table-bordered" data-test="checks">
     <thead>
         <tr>

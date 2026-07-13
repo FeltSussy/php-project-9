@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use DateTimeInterface;
 
-class Site
+class Url
 {
     private ?int $id;
     private string $name;
@@ -19,12 +19,12 @@ class Site
 
     public static function create(string $name, DateTimeInterface $createdAt)
     {
-        return new Site(null, $name, $createdAt);
+        return new Url(null, $name, $createdAt);
     }
 
     public static function createFromDatabase(int $id, string $name, DateTimeInterface $createdAt)
     {
-        return new Site($id, $name, $createdAt);
+        return new Url($id, $name, $createdAt);
     }
 
     public function getId(): int
