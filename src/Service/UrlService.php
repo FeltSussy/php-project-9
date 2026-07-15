@@ -13,7 +13,8 @@ class UrlService
 
     public function __construct(
         UrlRepository $repository
-    ) {
+    )
+    {
         $this->repository = $repository;
     }
 

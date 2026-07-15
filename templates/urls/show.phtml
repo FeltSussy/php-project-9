@@ -34,13 +34,15 @@
         </tr>
     </thead>
     <tbody>
+        <?php foreach ($checks as $check) : ?>
         <tr>
-            <td>1</td>
-            <td>200</td>
-            <td>...</td>
-            <td>...</td>
-            <td>...</td>
-            <td>2024-01-01</td>
+            <td><?= htmlspecialchars((string) $check->getId()) ?></td>
+            <td><?= htmlspecialchars((string) $check->getStatusCode()) ?></td>
+            <td><?= htmlspecialchars($check->getH1() ?? '') ?></td>
+            <td><?= htmlspecialchars($check->getTitle() ?? '') ?></td>
+            <td><?= htmlspecialchars($check->getDescription() ?? '') ?></td>
+            <td><?= htmlspecialchars($check->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
         </tr>
+        <?php endforeach ?>
     </tbody>
 </table>

@@ -10,21 +10,29 @@ class Url
     private string $name;
     private DateTimeInterface $createdAt;
 
-    private function __construct(?int $id, string $name, DateTimeInterface $createdAt)
-    {
+    private function __construct(
+        ?int $id,
+        string $name,
+        DateTimeInterface $createdAt
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->createdAt = $createdAt;
     }
 
-    public static function create(string $name, DateTimeInterface $createdAt)
-    {
-        return new Url(null, $name, $createdAt);
+    public static function create(
+        string $name,
+        DateTimeInterface $createdAt
+    ): self {
+        return new self(null, $name, $createdAt);
     }
 
-    public static function createFromDatabase(int $id, string $name, DateTimeInterface $createdAt)
-    {
-        return new Url($id, $name, $createdAt);
+    public static function createFromDatabase(
+        int $id,
+        string $name,
+        DateTimeInterface $createdAt
+    ): self {
+        return new self($id, $name, $createdAt);
     }
 
     public function getId(): int

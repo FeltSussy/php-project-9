@@ -3,33 +3,41 @@
 namespace App\Controller;
 
 use App\Repository\UrlRepository;
+use App\Repository\UrlCheckRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\PhpRenderer;
 use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
 use App\Service\UrlService;
+use App\Service\UrlCheckService;
 
 class UrlController
 {
     private PhpRenderer $renderer;
     private Messages $messages;
     private RouteParser $routeParser;
-    private UrlService $service;
-    private UrlRepository $repo;
+    private UrlService $urlService;
+    private UrlCheckService $urlCheckService;
+    private UrlRepository $urlRepository;
+    private UrlCheckRepository $urlCheckRepository;
 
     public function __construct(
         PhpRenderer $renderer,
         Messages $messages,
         RouteParser $routeParser,
-        UrlService $service,
-        UrlRepository $repo,
+        UrlService $urlService,
+        UrlCheckService $urlCheckService,
+        UrlRepository $urlRepository,
+        UrlCheckRepository $urlCheckRepository,
     ) {
         $this->renderer = $renderer;
         $this->messages = $messages;
         $this->routeParser = $routeParser;
-        $this->service = $service;
-        $this->repo = $repo;
+        $this->urlService = $urlService;
+        $this->urlCheckService = $urlCheckService;
+        $this->urlRepository = $urlRepository;
+        $this->urlCheckRepository = $urlCheckRepository;
     }
 
     private function setLayoutWithDefaultAttributes(): void
@@ -58,7 +66,7 @@ class UrlController
     public function index(ServerRequestInterface $request, ResponseInterface $response)
     {
         $this->setLayoutWithDefaultAttributes();
-        $allUrls = $this->repo->getAll();
+        $allUrls = $this->urlRepository->getAll();
         $params = [
             'urls' => $allUrls,
         ];
@@ -68,7 +76,7 @@ class UrlController
     public function store(ServerRequestInterface $request, ResponseInterface $response)
     {
         $url = $request->getParsedBody();
-        $result = $this->service->addUrl($url['url']);
+        $result = $this->urlService->addUrl($url['url']);
         $key = $result['key'];
         $message = $result['message'];
         $urlId = $result['urlId'];
@@ -76,7 +84,7 @@ class UrlController
         if ($key === 'success') {
             return $response->withHeader(
                 'Location',
-                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
+                $this->routeParser->urlFor('urls.id', ['urlId' => $urlId])
             )->withStatus(302);
         }
         if ($key === 'warning') {
@@ -90,10 +98,14 @@ class UrlController
     public function show(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $urlId = (int) $args['id'];
-        if ($url = $this->repo->findById($urlId)) {
+        // $checkId = (int) $args['checkId'];
+
+        if ($url = $this->urlRepository->findById($urlId)) {
             $this->setLayoutWithDefaultAttributes();
+            $checks = $this->urlCheckRepository->getAllForUrl($urlId);
             $params = [
                 'url' => $url,
+                'checks' => $checks
             ];
             return $this->renderer->render($response, 'urls/show.phtml', $params);
         }
@@ -102,7 +114,22 @@ class UrlController
 
     public function checks(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $urlId = (int) $args['id'];
-        
+        $urlId = (int) $args['url_id'];
+        $checkResult = $this->urlCheckService->checkUrl($urlId);
+        $key = $checkResult['key'];
+        $message = $checkResult['message'];
+        $this->messages->addMessage($key, $message);
+        if ($key === 'success') {
+            return $response->withHeader(
+                'Location',
+                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
+            )->withStatus(302);
+        }
+        if ($key === 'warning') {
+            return $response->withHeader(
+                'Location',
+                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
+            )->withStatus(302);
+        }
     }
 }
