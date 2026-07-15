@@ -4,7 +4,7 @@
             <div class="border rounded-3 bg-light p-5">
                 <h1 class="display-3">Анализатор страниц</h1>
                 <p class="lead mb-4">Бесплатно проверяйте сайты на SEO-пригодность</p>
-                <form action="<?= $routeParser->urlFor('urls') ?>" method="post">
+                <form action="<?= htmlspecialchars($routeParser->urlFor('urls')) ?>" method="post">
                     <div class="row g-3">
                         <div class="col">
                             <input name="url" class="form-control" placeholder="https://www.example.com">

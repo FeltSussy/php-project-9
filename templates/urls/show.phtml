@@ -19,24 +19,28 @@
 </table>
 <br>
 <h1 class="display-5">Проверки</h1>
-<form method="post" action="/urls/1/checks"> <?= $routeParser->urlFor('urls.checks') ?>
-    <input type="submit" value="Запустить проверку">
+<form method="post" action="<?= htmlspecialchars($routeParser->urlFor('urls.id.checks', ['url_id' => $url->getId()])) ?>">
+    <input class="btn btn-primary" type="submit" value="Запустить проверку">
 </form>
 <table class="table table-bordered" data-test="checks">
     <thead>
         <tr>
-            <th scope="col">1</th>
-            <th scope="col">2</th>
+            <th>ID</th>
+            <th>Код ответа</th>
+            <th>h1</th>
+            <th>title</th>
+            <th>description</th>
+            <th>Дата создания</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <th scope="row">3</th>
-            <td>4</td>
-        </tr>
-        <tr>
-            <th scope="row">5</th>
-            <td>6</td>
+            <td>1</td>
+            <td>200</td>
+            <td>...</td>
+            <td>...</td>
+            <td>...</td>
+            <td>2024-01-01</td>
         </tr>
     </tbody>
 </table>

@@ -7,7 +7,7 @@ use Valitron\Validator;
 use App\Entity\Url;
 use Carbon\Carbon;
 
-class UrlRegistrationService
+class UrlService
 {
     private UrlRepository $repository;
 
@@ -17,7 +17,7 @@ class UrlRegistrationService
         $this->repository = $repository;
     }
 
-    public function add(string $name)
+    public function addUrl(string $name)
     {
         $validator = new Validator(['urlName' => $name]);
         $validator->rules([
