@@ -84,7 +84,7 @@ class UrlController
         if ($key === 'success') {
             return $response->withHeader(
                 'Location',
-                $this->routeParser->urlFor('urls.id', ['urlId' => $urlId])
+                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
             )->withStatus(302);
         }
         if ($key === 'warning') {
@@ -119,17 +119,9 @@ class UrlController
         $key = $checkResult['key'];
         $message = $checkResult['message'];
         $this->messages->addMessage($key, $message);
-        if ($key === 'success') {
-            return $response->withHeader(
-                'Location',
-                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
-            )->withStatus(302);
-        }
-        if ($key === 'warning') {
-            return $response->withHeader(
-                'Location',
-                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
-            )->withStatus(302);
-        }
+        return $response->withHeader(
+            'Location',
+            $this->routeParser->urlFor('urls.id', ['id' => $urlId])
+        )->withStatus(302);
     }
 }

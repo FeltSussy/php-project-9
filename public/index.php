@@ -10,6 +10,7 @@ use App\Controller\ {
 use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
 use Slim\Views\PhpRenderer;
+use GuzzleHttp\Client;
 
 session_start();
 /**
@@ -31,6 +32,9 @@ $container->set(PhpRenderer::class, function () {
 });
 $container->set(Messages::class, function () {
     return new Messages();
+});
+$container->set(Client::class, function () {
+    return new Client();
 });
 $container->set(PDO::class, function () use ($databaseUrl) {
     return new PDO(

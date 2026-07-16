@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use PDO;
-use App\Entity\Url;
 use App\Entity\Check;
 use Carbon\Carbon;
 
@@ -16,24 +15,26 @@ class UrlCheckRepository
         $this->pdo = $pdo;
     }
 
-    public function save(Url $url): array
+    public function save(Check $check): bool
     {
-        $sql = "INSERT INTO url_checks (url_id, created_at) VALUES (:urlId, :createdAt)";
-        $stmt = $this->pdo->prepare($sql);
-        $result = $stmt->execute([
-            'urlId' => $url->getId(),
-            'createdAt' => $url->getCreatedAt()->format('Y-m-d H:i:s')
-        ]);
-        return $result ? [
-                'key' => 'success',
-                'message' => 'Страница успешно проверена',
-                'checkId' => (int) $this->pdo->lastInsertId(),
-                ]
-            :
-                [
-                'key' => 'warning',
-                'message' => 'Произошла ошибка при проверке, не удалось подключиться',
-                ];
+        $sql = "INSERT INTO url_checks (
+            url_id, status_code, h1, title, description, created_at)
+            VALUES (
+            :urlId, :statusCode, :h1, :title, :description, :createdAt)";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'urlId' => $check->getUrlId(),
+                'statusCode' => $check->getStatusCode(),
+                'h1' => $check->getH1(),
+                'title' => $check->getTitle(),
+                'description' => $check->getDescription(),
+                'createdAt' => $check->getCreatedAt()->format('Y-m-d H:i:s')
+            ]);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function findById(int $checkId)
@@ -45,10 +46,10 @@ class UrlCheckRepository
             return Check::createFromDatabase(
                 $check['id'],
                 $check['url_id'],
-                null,
-                null,
-                null,
-                null,
+                $check['status_code'],
+                $check['h1'],
+                $check['title'],
+                $check['description'],
                 Carbon::parse($check['created_at'])
             );
         }
@@ -64,10 +65,10 @@ class UrlCheckRepository
             $result[] = Check::createFromDatabase(
                 $check['id'],
                 $check['url_id'],
-                null,
-                null,
-                null,
-                null,
+                $check['status_code'],
+                $check['h1'],
+                $check['title'],
+                $check['description'],
                 Carbon::parse($check['created_at'])
             );
         }
