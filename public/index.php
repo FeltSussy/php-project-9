@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use DI\Container;
@@ -19,7 +19,7 @@ session_start();
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/..");
 $dotenv->load();
 if (!isset($_ENV['DATABASE_URL'])) {
-    throw new \Exception('DATABASE_URL is not defined');
+    throw new \RuntimeException('DATABASE_URL is not defined');
 }
 $databaseUrl = parse_url($_ENV['DATABASE_URL']);
 

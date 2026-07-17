@@ -55,7 +55,7 @@ class UrlCheckRepository
         }
         return null;
     }
-    
+
     public function getAllForUrl(int $urlId)
     {
         $result = [];

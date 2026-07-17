@@ -19,8 +19,7 @@ class UrlCheckService
         UrlCheckRepository $checkRepository,
         UrlRepository $urlRepository,
         Client $client,
-    )
-    {
+    ) {
         $this->checkRepository = $checkRepository;
         $this->urlRepository = $urlRepository;
         $this->client = $client;
@@ -69,8 +68,3 @@ class UrlCheckService
         return $attribute === null ? $node->text() : $node->attr($attribute);
     }
 }
-// require __DIR__ . '/../../vendor/autoload.php';
-
-// $client = new Client();
-// $response = $client->get('https://php-project-9-9grq.ender.com');
-// print_r($response->getStatusCode());

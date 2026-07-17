@@ -100,7 +100,6 @@ class UrlController
     public function show(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $urlId = (int) $args['id'];
-        // $checkId = (int) $args['checkId'];
 
         if ($url = $this->urlRepository->findById($urlId)) {
             $this->setLayoutWithDefaultAttributes();
@@ -116,7 +115,7 @@ class UrlController
 
     public function check(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $urlId = (int) $args['url_id'];
+        $urlId = $args['url_id'];
         $checkResult = $this->urlCheckService->checkUrl($urlId);
         $key = $checkResult['key'];
         $message = $checkResult['message'];

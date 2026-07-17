@@ -13,8 +13,7 @@ class UrlService
 
     public function __construct(
         UrlRepository $repository
-    )
-    {
+    ) {
         $this->repository = $repository;
     }
 
@@ -56,11 +55,17 @@ class UrlService
                 'urlId' => null,
             ];
         }
-        $result = $this->repository->save($url);
+        if ($this->repository->save($url)) {
+            return [
+                'key' => 'success',
+                'message' => 'Страница успешно добавлена',
+                'urlId' => $this->repository->getLastInsertId(),
+            ];
+        }
         return [
-            'key' => 'success',
-            'message' => 'Страница успешно добавлена',
-            'urlId' => $this->repository->getLastInsertId(),
+            'key' => 'danger',
+            'message' => 'Произошла ошибка при внесении в базу данных',
+            'urlId' => null,
         ];
     }
 }

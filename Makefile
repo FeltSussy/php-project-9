@@ -18,7 +18,7 @@ show-coverage:
 	XDEBUG_MODE=coverage composer exec --verbose phpunit -- --coverage-text
 
 lint:
-	composer exec --verbose phpcs -- --standard=PSR12 public
+	composer exec --verbose phpcs -- --standard=PSR12 src
 
 phpstan:
-	composer exec --verbose phpstan analyse -- -c phpstan.neon public
+	composer exec --verbose phpstan analyse -- -c phpstan.neon src
