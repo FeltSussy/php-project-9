@@ -38,9 +38,9 @@
         <tr>
             <td><?= $index + 1 ?></td>
             <td><?= htmlspecialchars((string) $check->getStatusCode()) ?></td>
-            <td><?= htmlspecialchars($check->getH1() ?? '') ?></td>
-            <td><?= htmlspecialchars($check->getTitle() ?? '') ?></td>
-            <td><?= htmlspecialchars($check->getDescription() ?? '') ?></td>
+            <td><?= truncate(htmlspecialchars($check->getH1() ?? ''), 200) ?></td>
+            <td><?= truncate(htmlspecialchars($check->getTitle() ?? ''), 200) ?></td>
+            <td><?= truncate(htmlspecialchars($check->getDescription() ?? ''), 200) ?></td>
             <td><?= htmlspecialchars($check->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
         </tr>
         <?php endforeach ?>

@@ -15,26 +15,15 @@ class UrlRepository
         $this->pdo = $pdo;
     }
 
-    public function save(Url $url): array
+    public function save(Url $url): bool
     {
-        if ($this->findByName($url->getName())) {
-            return [
-                'key' => 'warning',
-                'message' => 'Страница уже существует',
-                'urlId' => null,
-            ];
-        }
         $sql = "INSERT INTO urls (name, created_at) VALUES (:name, :created_at)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'name' => $url->getName(),
             'created_at' => $url->getCreatedAt()->format('Y-m-d H:i:s'),
         ]);
-        return [
-            'key' => 'success',
-            'message' => 'Страница успешно добавлена',
-            'urlId' => (int) $this->pdo->lastInsertId(),
-        ];
+        return true;
     }
 
     public function findByName(string $name): ?Url
@@ -80,5 +69,10 @@ class UrlRepository
             );
         }
         return $result;
+    }
+
+    public function getLastInsertId(): string|bool
+    {
+        return $this->pdo->lastInsertId();
     }
 }

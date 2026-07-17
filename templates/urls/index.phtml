@@ -17,8 +17,18 @@
                     <?= htmlspecialchars($url->getName()) ?>
                 </a>
             </td>
-            <td></td>
-            <td></td>
+            <td>
+                <?= isset($lastChecks[$url->getId()])
+                        ? $lastChecks[$url->getId()]->getCreatedAt()->format('Y-m-d H:i:s')
+                        : ''
+                ?>
+            </td>
+            <td>
+                <?= isset($lastChecks[$url->getId()])
+                        ? $lastChecks[$url->getId()]->getStatusCode()
+                        : ''
+                ?>
+            </td>
         </tr>
         <?php endforeach ?>
     </tbody>

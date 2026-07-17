@@ -3,7 +3,10 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helpers/helper.php"
+        ]
     },
     "authors": [
         {
@@ -24,7 +27,6 @@
         "nesbot/carbon": "^3.13",
         "guzzlehttp/guzzle": "^7.14",
         "symfony/dom-crawler": "^8.1",
-        "illuminate/support": "^13.20",
         "symfony/css-selector": "^8.1"
     },
     "require-dev": {

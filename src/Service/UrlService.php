@@ -18,53 +18,49 @@ class UrlService
         $this->repository = $repository;
     }
 
-    public function addUrl(string $name)
+    public function addUrl(string $name): array
     {
         $validator = new Validator(['urlName' => $name]);
-        $validator->rules([
-            'required' => [
-                ['urlName']
-            ]
-        ]);
-        if (!$validator->validate()) {
-            return [
-                'key' => 'warning',
-                'message' => 'URL не должен быть пустым',
-                'urlId' => null,
-            ];
-        }
+        $validator->stopOnFirstFail();
 
-        $validator->rules([
-            'url' => [
-                ['urlName']
-            ]
-        ]);
-        if (!$validator->validate()) {
-            return [
-                'key' => 'warning',
-                'message' => 'Некорректный URL',
-                'urlId' => null,
-            ];
-        }
+        $validator
+            ->rule('required', 'urlName')
+            ->message('URL не должен быть пустым');
 
-        $validator->rules([
-            'lengthMax' => [
-                ['urlName', 255]
-            ]
-        ]);
+        $validator
+            ->rule('url', 'urlName')
+            ->message('Некорректный URL');
+
+        $validator
+            ->rule('lengthMax', 'urlName', 255)
+            ->message('URL превышает 255 символов');
+
         if (!$validator->validate()) {
+            $errors = $validator->errors('urlName');
+
             return [
                 'key' => 'warning',
-                'message' => 'URL превышает 255 символов',
+                'message' => $errors[0],
                 'urlId' => null,
             ];
         }
 
         $parsedUrlName = parse_url($name);
-        $urlNameToSave = "{$parsedUrlName['scheme']}://{$parsedUrlName['host']}";
+        $urlNameToSave = $parsedUrlName['scheme'] . "://" . $parsedUrlName['host'];
 
         $url = Url::create($urlNameToSave, Carbon::now());
+        if ($this->repository->findByName($url->getName())) {
+            return [
+                'key' => 'warning',
+                'message' => 'Страница уже существует',
+                'urlId' => null,
+            ];
+        }
         $result = $this->repository->save($url);
-        return $result;
+        return [
+            'key' => 'success',
+            'message' => 'Страница успешно добавлена',
+            'urlId' => $this->repository->getLastInsertId(),
+        ];
     }
 }

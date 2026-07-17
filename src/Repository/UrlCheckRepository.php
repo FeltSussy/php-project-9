@@ -74,4 +74,25 @@ class UrlCheckRepository
         }
         return $result;
     }
+
+    public function getAllLastChecks(): array
+    {
+        $result = [];
+        $sql = "SELECT DISTINCT ON (url_id) *
+                FROM url_checks
+                ORDER BY url_id, created_at DESC";
+        $stmt = $this->pdo->query($sql);
+        while ($check = $stmt->fetch()) {
+            $result[$check['url_id']] = Check::createFromDatabase(
+                $check['id'],
+                $check['url_id'],
+                $check['status_code'],
+                $check['h1'],
+                $check['title'],
+                $check['description'],
+                Carbon::parse($check['created_at'])
+            );
+        }
+        return $result;
+    }
 }

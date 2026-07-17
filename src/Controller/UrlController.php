@@ -67,8 +67,10 @@ class UrlController
     {
         $this->setLayoutWithDefaultAttributes();
         $allUrls = $this->urlRepository->getAll();
+        $allLastChecks = $this->urlCheckRepository->getAllLastChecks();
         $params = [
             'urls' => $allUrls,
+            'lastChecks' => $allLastChecks,
         ];
         return $this->renderer->render($response, 'urls/index.phtml', $params);
     }

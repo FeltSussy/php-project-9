@@ -30,8 +30,8 @@ class UrlCheckService
     {
         $url = $this->urlRepository->findById($urlId);
         try {
-            $response = $this->client->get($url->getName());
-        } catch (\Throwable $e) {
+            $response = $this->client->get($url->getName(), ['timeout' => 10]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
             return [
                 'key' => 'danger',
                 'message' => 'Произошла ошибка при проверке, не удалось подключиться',
@@ -54,7 +54,6 @@ class UrlCheckService
                 'message' => 'Страница успешно проверена',
             ];
         }
-
         return [
             'key' => 'danger',
             'message' => 'Произошла ошибка при внесении в базу данных',
