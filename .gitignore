@@ -1,2 +1,8 @@
 /vendor/
 .env
+/build/
+logs
+coverage.xml
+*.swo
+*.swp
+*.cache

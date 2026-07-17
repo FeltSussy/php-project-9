@@ -114,7 +114,7 @@ class UrlController
         return $response->withStatus(404);
     }
 
-    public function checks(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function check(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $urlId = (int) $args['url_id'];
         $checkResult = $this->urlCheckService->checkUrl($urlId);

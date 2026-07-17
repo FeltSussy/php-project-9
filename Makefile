@@ -5,6 +5,18 @@ start:
 install:
 	composer install
 
+validate:
+	composer validate
+
+test:
+	composer exec --verbose phpunit tests -- --display-notices --testdox
+
+test-coverage:
+	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-clover=build/logs/clover.xml
+
+show-coverage:
+	XDEBUG_MODE=coverage composer exec --verbose phpunit -- --coverage-text
+
 lint:
 	composer exec --verbose phpcs -- --standard=PSR12 public
 

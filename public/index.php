@@ -74,7 +74,7 @@ $app->get('/urls', [UrlController::class, 'index'])
 $app->get('/urls/{id}', [UrlController::class, 'show'])
     ->setName('urls.id');
 
-$app->post('/urls/{url_id}/checks', [UrlController::class, 'checks'])
+$app->post('/urls/{url_id}/checks', [UrlController::class, 'check'])
     ->setName('urls.id.checks');
 
 $app->run();
