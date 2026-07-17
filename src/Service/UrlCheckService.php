@@ -4,23 +4,23 @@ namespace App\Service;
 
 use App\Repository\UrlCheckRepository;
 use App\Repository\UrlRepository;
-use App\Entity\Check;
+use App\Entity\UrlCheck;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use Carbon\Carbon;
 
 class UrlCheckService
 {
-    private UrlCheckRepository $checkRepository;
+    private UrlCheckRepository $urlCheckRepository;
     private UrlRepository $urlRepository;
     private Client $client;
 
     public function __construct(
-        UrlCheckRepository $checkRepository,
+        UrlCheckRepository $urlCheckRepository,
         UrlRepository $urlRepository,
         Client $client,
     ) {
-        $this->checkRepository = $checkRepository;
+        $this->urlCheckRepository = $urlCheckRepository;
         $this->urlRepository = $urlRepository;
         $this->client = $client;
     }
@@ -38,7 +38,7 @@ class UrlCheckService
         }
 
         $crawler = new Crawler($response->getBody());
-        $check = Check::create(
+        $urlCheck = UrlCheck::create(
             $url->getId(),
             $response->getStatusCode(),
             $this->crawl($crawler, 'h1'),
@@ -47,7 +47,7 @@ class UrlCheckService
             Carbon::now(),
         );
 
-        if ($this->checkRepository->save($check)) {
+        if ($this->urlCheckRepository->save($urlCheck)) {
             return [
                 'key' => 'success',
                 'message' => 'Страница успешно проверена',

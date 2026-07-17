@@ -13,8 +13,3 @@ CREATE TABLE url_checks (
     description TEXT,
     created_at TIMESTAMP
 );
-
-
-ограничение в 200 символов
-рефактор url
-пагинация

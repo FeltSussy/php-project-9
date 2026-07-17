@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use PDO;
-use App\Entity\Check;
+use App\Entity\UrlCheck;
 use Carbon\Carbon;
 
 class UrlCheckRepository
@@ -15,7 +15,7 @@ class UrlCheckRepository
         $this->pdo = $pdo;
     }
 
-    public function save(Check $check): bool
+    public function save(UrlCheck $urlCheck): bool
     {
         $sql = "INSERT INTO url_checks (
             url_id, status_code, h1, title, description, created_at)
@@ -24,12 +24,12 @@ class UrlCheckRepository
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                'urlId' => $check->getUrlId(),
-                'statusCode' => $check->getStatusCode(),
-                'h1' => $check->getH1(),
-                'title' => $check->getTitle(),
-                'description' => $check->getDescription(),
-                'createdAt' => $check->getCreatedAt()->format('Y-m-d H:i:s')
+                'urlId' => $urlCheck->getUrlId(),
+                'statusCode' => $urlCheck->getStatusCode(),
+                'h1' => $urlCheck->getH1(),
+                'title' => $urlCheck->getTitle(),
+                'description' => $urlCheck->getDescription(),
+                'createdAt' => $urlCheck->getCreatedAt()->format('Y-m-d H:i:s')
             ]);
             return true;
         } catch (\Throwable $e) {
@@ -37,13 +37,13 @@ class UrlCheckRepository
         }
     }
 
-    public function findById(int $checkId)
+    public function findById(int $checkId): UrlCheck|bool
     {
         $sql = "SELECT * FROM url_checks WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $checkId]);
         if ($check = $stmt->fetch()) {
-            return Check::createFromDatabase(
+            return UrlCheck::createFromDatabase(
                 $check['id'],
                 $check['url_id'],
                 $check['status_code'],
@@ -53,16 +53,17 @@ class UrlCheckRepository
                 Carbon::parse($check['created_at'])
             );
         }
-        return null;
+        return false;
     }
 
-    public function getAllForUrl(int $urlId)
+    public function findAllByUrlId(int $urlId): array
     {
         $result = [];
-        $sql = "SELECT * FROM url_checks WHERE url_id = {$urlId} ORDER BY created_at DESC";
-        $stmt = $this->pdo->query($sql);
+        $sql = "SELECT * FROM url_checks WHERE :url_id ORDER BY created_at DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['url_id' => $urlId]);
         while ($check = $stmt->fetch()) {
-            $result[] = Check::createFromDatabase(
+            $result[] = UrlCheck::createFromDatabase(
                 $check['id'],
                 $check['url_id'],
                 $check['status_code'],
@@ -75,7 +76,7 @@ class UrlCheckRepository
         return $result;
     }
 
-    public function getAllLastChecks(): array
+    public function findLatestForEachUrl(): array
     {
         $result = [];
         $sql = "SELECT DISTINCT ON (url_id) *
@@ -83,7 +84,7 @@ class UrlCheckRepository
                 ORDER BY url_id, created_at DESC";
         $stmt = $this->pdo->query($sql);
         while ($check = $stmt->fetch()) {
-            $result[$check['url_id']] = Check::createFromDatabase(
+            $result[$check['url_id']] = UrlCheck::createFromDatabase(
                 $check['id'],
                 $check['url_id'],
                 $check['status_code'],

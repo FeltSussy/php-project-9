@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use DateTimeInterface;
 
-class Check
+class UrlCheck
 {
     private ?int $id;
     private int $urlId;

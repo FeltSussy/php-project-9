@@ -67,10 +67,10 @@ class UrlController
     {
         $this->setLayoutWithDefaultAttributes();
         $allUrls = $this->urlRepository->getAll();
-        $allLastChecks = $this->urlCheckRepository->getAllLastChecks();
+        $latestChecksByUrlId = $this->urlCheckRepository->findLatestForEachUrl();
         $params = [
             'urls' => $allUrls,
-            'lastChecks' => $allLastChecks,
+            'lastChecks' => $latestChecksByUrlId,
         ];
         return $this->renderer->render($response, 'urls/index.phtml', $params);
     }
@@ -103,7 +103,7 @@ class UrlController
 
         if ($url = $this->urlRepository->findById($urlId)) {
             $this->setLayoutWithDefaultAttributes();
-            $checks = $this->urlCheckRepository->getAllForUrl($urlId);
+            $checks = $this->urlCheckRepository->findAllByUrlId($urlId);
             $params = [
                 'url' => $url,
                 'checks' => $checks
@@ -113,7 +113,7 @@ class UrlController
         return $response->withStatus(404);
     }
 
-    public function check(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function storeCheck(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $urlId = $args['url_id'];
         $checkResult = $this->urlCheckService->checkUrl($urlId);
