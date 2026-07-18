@@ -27,14 +27,19 @@ class UrlCheckService
 
     public function checkUrl(int $urlId)
     {
-        $url = $this->urlRepository->findById($urlId);
+        if (!$url = $this->urlRepository->findById($urlId)) {
+            return [
+                'key' => 'warning',
+                'message' => 'Страницы с ID {$url} не существует',
+            ];
+        }
         try {
-            $response = $this->client->get($url->getName(), ['timeout' => 10]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $this->client->get($url->getName(), ['timeout' => 15]);
+        } catch (\Throwable $e) {
             return [
                 'key' => 'danger',
                 'message' => 'Произошла ошибка при проверке, не удалось подключиться',
-                ];
+            ];
         }
 
         $crawler = new Crawler($response->getBody());
@@ -47,15 +52,10 @@ class UrlCheckService
             Carbon::now(),
         );
 
-        if ($this->urlCheckRepository->save($urlCheck)) {
-            return [
-                'key' => 'success',
-                'message' => 'Страница успешно проверена',
-            ];
-        }
+        $this->urlCheckRepository->save($urlCheck);
         return [
-            'key' => 'danger',
-            'message' => 'Произошла ошибка при внесении в базу данных',
+            'key' => 'success',
+            'message' => 'Страница успешно проверена',
         ];
     }
 

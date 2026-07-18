@@ -59,7 +59,7 @@ class UrlCheckRepository
     public function findAllByUrlId(int $urlId): array
     {
         $result = [];
-        $sql = "SELECT * FROM url_checks WHERE :url_id ORDER BY created_at DESC";
+        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['url_id' => $urlId]);
         while ($check = $stmt->fetch()) {

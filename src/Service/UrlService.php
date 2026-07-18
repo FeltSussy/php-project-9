@@ -55,17 +55,11 @@ class UrlService
                 'urlId' => null,
             ];
         }
-        if ($this->repository->save($url)) {
-            return [
-                'key' => 'success',
-                'message' => 'Страница успешно добавлена',
-                'urlId' => $this->repository->getLastInsertId(),
-            ];
-        }
+        $this->repository->save($url);
         return [
-            'key' => 'danger',
-            'message' => 'Произошла ошибка при внесении в базу данных',
-            'urlId' => null,
+            'key' => 'success',
+            'message' => 'Страница успешно добавлена',
+            'urlId' => $this->repository->getLastInsertId(),
         ];
     }
 }

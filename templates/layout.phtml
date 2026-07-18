@@ -32,7 +32,11 @@
                     </div>
                 <?php endforeach ?>
             <?php endforeach ?>
-        <?php endif ?>
+        <?php elseif (isset($error)): ?>
+            <div class="alert alert-warning ?>" role="alert">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
         <!-- content -->
         <?= $content ?>
     </main>
