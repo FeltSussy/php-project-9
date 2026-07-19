@@ -35,11 +35,13 @@ class UrlCheckService
         }
         try {
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
-        } catch (\Throwable $e) {
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
             return [
                 'key' => 'danger',
                 'message' => 'Произошла ошибка при проверке, не удалось подключиться',
             ];
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $response = $e->getResponse();
         }
 
         $crawler = new Crawler($response->getBody());
