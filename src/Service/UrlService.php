@@ -62,4 +62,14 @@ class UrlService
             'urlId' => $this->repository->getLastInsertId(),
         ];
     }
+
+    public function getAllUrls()
+    {
+        return $this->repository->getAll();
+    }
+
+    public function getUrlById(int $urlId)
+    {
+        return $this->repository->findById($urlId);
+    }
 }

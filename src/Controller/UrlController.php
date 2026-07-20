@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\UrlRepository;
-use App\Repository\UrlCheckRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\PhpRenderer;
@@ -19,8 +17,6 @@ class UrlController
     private RouteParser $routeParser;
     private UrlService $urlService;
     private UrlCheckService $urlCheckService;
-    private UrlRepository $urlRepository;
-    private UrlCheckRepository $urlCheckRepository;
 
     public function __construct(
         PhpRenderer $renderer,
@@ -28,16 +24,12 @@ class UrlController
         RouteParser $routeParser,
         UrlService $urlService,
         UrlCheckService $urlCheckService,
-        UrlRepository $urlRepository,
-        UrlCheckRepository $urlCheckRepository,
     ) {
         $this->renderer = $renderer;
         $this->messages = $messages;
         $this->routeParser = $routeParser;
         $this->urlService = $urlService;
         $this->urlCheckService = $urlCheckService;
-        $this->urlRepository = $urlRepository;
-        $this->urlCheckRepository = $urlCheckRepository;
     }
 
     private function setLayoutWithtAttributes(array $attributes): void
@@ -69,8 +61,8 @@ class UrlController
             'routeParser' => $this->routeParser,
             'flash' => $this->messages->getMessages(),
         ]);
-        $allUrls = $this->urlRepository->getAll();
-        $latestChecksByUrlId = $this->urlCheckRepository->findLatestForEachUrl();
+        $allUrls = $this->urlService->getAllUrls();
+        $latestChecksByUrlId = $this->urlCheckService->getLatestChecksOfAllUrls();
         $params = [
             'urls' => $allUrls,
             'lastChecks' => $latestChecksByUrlId
@@ -118,12 +110,12 @@ class UrlController
     {
         $urlId = (int) $args['id'];
 
-        if ($url = $this->urlRepository->findById($urlId)) {
+        if ($url = $this->urlService->getUrlById($urlId)) {
             $this->setLayoutWithtAttributes([
                 'routeParser' => $this->routeParser,
                 'flash' => $this->messages->getMessages(),
             ]);
-            $checks = $this->urlCheckRepository->findAllByUrlId($urlId);
+            $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
             $params = [
                 'url' => $url,
                 'checks' => $checks
@@ -149,12 +141,12 @@ class UrlController
         }
 
         if ($key === 'warning' || $key === 'danger') {
-            $url = $this->urlRepository->findById($urlId);
+            $url = $this->urlService->getUrlById($urlId);
             $this->setLayoutWithtAttributes([
                 'routeParser' => $this->routeParser,
                 'error' => $message
             ]);
-            $checks = $this->urlCheckRepository->findAllByUrlId($urlId);
+            $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
             $params = [
                 'url' => $url,
                 'checks' => $checks

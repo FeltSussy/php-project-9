@@ -30,7 +30,7 @@ class UrlCheckService
         if (!$url = $this->urlRepository->findById($urlId)) {
             return [
                 'key' => 'warning',
-                'message' => 'Страницы с ID {$url} не существует',
+                'message' => "Страницы с ID {$urlId} не существует",
             ];
         }
         try {
@@ -44,21 +44,47 @@ class UrlCheckService
             $response = $e->getResponse();
         }
 
-        $crawler = new Crawler($response->getBody());
+        $statusCode = null;
+        $h1 = '';
+        $title = '';
+        $description = '';
+
+        if ($response !== null) {
+            $crawler = new Crawler($response->getBody());
+            $statusCode = $response->getStatusCode();
+            $h1 = $this->crawl($crawler, 'h1');
+            $title = $this->crawl($crawler, 'title');
+            $description = $this->crawl($crawler, 'meta[name="description"]', 'content');
+        }
+
         $urlCheck = UrlCheck::create(
             $url->getId(),
-            $response->getStatusCode(),
-            $this->crawl($crawler, 'h1'),
-            $this->crawl($crawler, 'title'),
-            $this->crawl($crawler, 'meta[name="description"]', 'content'),
+            $statusCode,
+            $h1,
+            $title,
+            $description,
             Carbon::now(),
         );
 
-        $this->urlCheckRepository->save($urlCheck);
+        if ($this->urlCheckRepository->save($urlCheck))
+            return [
+                'key' => 'success',
+                'message' => 'Страница успешно проверена',
+            ];
         return [
-            'key' => 'success',
-            'message' => 'Страница успешно проверена',
+            'key' => 'danger',
+            'message' => 'Произошла ошибка, проверка не была сохранена',
         ];
+    }
+
+    public function getLatestChecksOfAllUrls()
+    {
+        return $this->urlCheckRepository->findLatestForEachUrl();
+    }
+
+    public function getAllChecksOfSpecificUrlId(int $urlId)
+    {
+        return $this->urlCheckRepository->findAllByUrlId($urlId);
     }
 
     private function crawl(Crawler $crawler, string $selector, ?string $attribute = null): ?string
