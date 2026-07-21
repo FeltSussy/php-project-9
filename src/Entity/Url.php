@@ -10,7 +10,7 @@ class Url
     private string $name;
     private DateTimeInterface $createdAt;
 
-    private function __construct(
+    public function __construct(
         ?int $id,
         string $name,
         DateTimeInterface $createdAt

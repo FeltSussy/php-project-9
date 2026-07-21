@@ -8,6 +8,10 @@
             "src/Helpers/helper.php"
         ]
     },
+    "scripts": {
+        "db-init": "php bin/db-init.php"
+    },
+
     "authors": [
         {
             "name": "Felt",
@@ -22,7 +26,7 @@
         "php-di/php-di": "^7.1",
         "illuminate/collections": "^13.18",
         "slim/flash": "^0.4.0",
-        "twbs/bootstrap": "5.3.8",
+        "twbs/bootstrap": "^5.3.8",
         "vlucas/valitron": "^1.4",
         "nesbot/carbon": "^3.13",
         "guzzlehttp/guzzle": "^7.14",

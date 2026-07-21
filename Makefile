@@ -21,4 +21,7 @@ lint:
 	composer exec --verbose phpcs -- --standard=PSR12 src
 
 phpstan:
-	composer exec --verbose phpstan analyse -- -c phpstan.neon src
+	composer exec --verbose phpstan analyse -- -c phpstan.neon --memory-limit=512M src
+
+db-init:
+	composer run db-init

@@ -14,7 +14,7 @@ class UrlCheck
     private ?string $description;
     private DateTimeInterface $createdAt;
 
-    private function __construct(
+    public function __construct(
         ?int $id,
         int $urlId,
         ?int $statusCode,

@@ -9,6 +9,12 @@ use Carbon\Carbon;
 
 class UrlService
 {
+    private const MESSAGE_URL_REQUIRED = 'URL не должен быть пустым';
+    private const MESSAGE_URL_INVALID = 'Некорректный URL';
+    private const MESSAGE_URL_TOO_LONG = 'URL превышает 255 символов';
+    private const MESSAGE_URL_ALREADY_EXISTS = 'Страница уже существует';
+    private const MESSAGE_URL_ADDED = 'Страница успешно добавлена';
+
     private UrlRepository $repository;
 
     public function __construct(
@@ -24,15 +30,15 @@ class UrlService
 
         $validator
             ->rule('required', 'urlName')
-            ->message('URL не должен быть пустым');
+            ->message(self::MESSAGE_URL_REQUIRED);
 
         $validator
             ->rule('url', 'urlName')
-            ->message('Некорректный URL');
+            ->message(self::MESSAGE_URL_INVALID);
 
         $validator
             ->rule('lengthMax', 'urlName', 255)
-            ->message('URL превышает 255 символов');
+            ->message(self::MESSAGE_URL_TOO_LONG);
 
         if (!$validator->validate()) {
             $errors = $validator->errors('urlName');
@@ -51,14 +57,14 @@ class UrlService
         if ($this->repository->findByName($url->getName())) {
             return [
                 'key' => 'warning',
-                'message' => 'Страница уже существует',
+                'message' => self::MESSAGE_URL_ALREADY_EXISTS,
                 'urlId' => null,
             ];
         }
         $this->repository->save($url);
         return [
             'key' => 'success',
-            'message' => 'Страница успешно добавлена',
+            'message' => self::MESSAGE_URL_ADDED,
             'urlId' => $this->repository->getLastInsertId(),
         ];
     }

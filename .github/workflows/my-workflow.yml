@@ -8,6 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v6
 
@@ -16,8 +30,14 @@ jobs:
         with:
           php-version: '8.4'
 
+      - name: add and configure env.
+        run: echo 'DATABASE_URL="postgres://postgres:postgres@localhost:5432/testdb"' > .env
+
       - name: composer installation
         run: make install
+
+      - name: migration
+        run: make db-init
 
       - name: linter
         run: make lint
@@ -25,8 +45,8 @@ jobs:
       - name: phpstan
         run: make phpstan
 
-      # - name: tests
-      #   run: make test
+      - name: tests
+        run: make test
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0

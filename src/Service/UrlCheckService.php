@@ -11,6 +11,10 @@ use Carbon\Carbon;
 
 class UrlCheckService
 {
+    private const MESSAGE_CONNECT_FAILED = 'Произошла ошибка при проверке, не удалось подключиться';
+    private const MESSAGE_CHECK_SAVED = 'Страница успешно проверена';
+    private const MESSAGE_CHECK_NOT_SAVED = 'Произошла ошибка, проверка не была сохранена';
+
     private UrlCheckRepository $urlCheckRepository;
     private UrlRepository $urlRepository;
     private Client $client;
@@ -27,18 +31,13 @@ class UrlCheckService
 
     public function checkUrl(int $urlId)
     {
-        if (!$url = $this->urlRepository->findById($urlId)) {
-            return [
-                'key' => 'warning',
-                'message' => "Страницы с ID {$urlId} не существует",
-            ];
-        }
+        $url = $this->urlRepository->findById($urlId);
         try {
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             return [
                 'key' => 'danger',
-                'message' => 'Произошла ошибка при проверке, не удалось подключиться',
+                'message' => self::MESSAGE_CONNECT_FAILED,
             ];
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $response = $e->getResponse();
@@ -66,14 +65,15 @@ class UrlCheckService
             Carbon::now(),
         );
 
-        if ($this->urlCheckRepository->save($urlCheck))
+        if ($this->urlCheckRepository->save($urlCheck)) {
             return [
                 'key' => 'success',
-                'message' => 'Страница успешно проверена',
+                'message' => self::MESSAGE_CHECK_SAVED,
             ];
+        }
         return [
             'key' => 'danger',
-            'message' => 'Произошла ошибка, проверка не была сохранена',
+            'message' => self::MESSAGE_CHECK_NOT_SAVED,
         ];
     }
 
