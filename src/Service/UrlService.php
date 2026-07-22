@@ -43,8 +43,11 @@ class UrlService
             ];
         }
 
-        $parsedUrlName = parse_url($name);
-        $urlNameToSave = $parsedUrlName['scheme'] . "://" . $parsedUrlName['host'];
+        $parsed = parse_url($name);
+        $urlNameToSave = $parsed['scheme']
+            . '://'
+            . $parsed['host']
+            . (isset($parsed['port']) ? ':' . $parsed['port'] : '');
 
         $url = Url::create($urlNameToSave, Carbon::now());
         if ($existingUrl = $this->repository->findByName($url->getName())) {

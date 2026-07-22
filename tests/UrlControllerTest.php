@@ -208,16 +208,6 @@ class UrlControllerTest extends TestCase
                 'status' => 'check_saved',
                 'urlId' => null
             ]);
-        $this->urlService
-            ->expects($this->once())
-            ->method('getUrlById')
-            ->with(10)
-            ->willReturn(new Url(
-                10,
-                'https://example.com',
-                Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00')
-            ));
-
 
         $result = $this->urlController->check($this->request, $this->response, ['url_id' => 10]);
 

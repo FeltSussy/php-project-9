@@ -164,12 +164,10 @@ class UrlController
             default => throw new \InvalidArgumentException("Unknown status: $status")
         };
 
-        $url = $this->urlService->getUrlById($urlId);
         $this->setLayoutWithtAttributes([
             'routeParser' => $this->routeParser,
             'error' => ['key' => $type, 'message' => $message]
         ]);
-        $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
 
         $this->messages->addMessage($type, $message);
 
