@@ -112,8 +112,7 @@ class UrlControllerTest extends TestCase
             ->method('addUrl')
             ->with('https://example.com/path?key=value')
             ->willReturn([
-                'key' => 'success',
-                'message' => 'Страница успешно добавлена',
+                'status' => 'url_added',
                 'urlId' => 1
             ]);
 
@@ -135,8 +134,7 @@ class UrlControllerTest extends TestCase
             ->method('addUrl')
             ->with('wrong-url')
             ->willReturn([
-                'key' => 'warning',
-                'message' => 'Некорректный URL',
+                'status' => 'url_invalid',
                 'urlId' => null
             ]);
 
@@ -195,25 +193,30 @@ class UrlControllerTest extends TestCase
         $this->assertEquals(404, $result->getStatusCode());
     }
 
-    public function testStoreCheck()
+    public function testCheck()
     {
-        $this->routeParser
-            ->expects($this->once())
-            ->method('urlFor')
-            ->with('urls.id', ['id' => 10])
-            ->willReturn('/urls/10');
         $this->urlCheckService
             ->expects($this->once())
             ->method('checkUrl')
             ->with(10)
             ->willReturn([
-                'key' => 'success',
-                'message' => 'Страница успешно проверена',
+                'status' => 'check_saved',
+                'urlId' => null
             ]);
+        $this->urlService
+            ->expects($this->once())
+            ->method('getUrlById')
+            ->with(10)
+            ->willReturn(new Url(
+                10,
+                'https://example.com',
+                Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00')
+            ));
 
-        $result = $this->urlController->storeCheck($this->request, $this->response, ['url_id' => 10]);
 
-        $this->assertEquals(302, $result->getStatusCode());
-        $this->assertEquals('/urls/10', $result->getHeaderLine('Location'));
+        $result = $this->urlController->check($this->request, $this->response, ['url_id' => 10]);
+
+        $this->assertEquals(200, $result->getStatusCode());
+        $this->assertStringContainsString('Страница успешно проверена', $result->getBody());
     }
 }

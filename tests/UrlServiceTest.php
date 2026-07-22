@@ -41,8 +41,7 @@ class UrlServiceTest extends TestCase
 
         $result = $this->urlService->addUrl('https://example.com/test?key=value');
 
-        $this->assertEquals('success', $result['key']);
-        $this->assertEquals('Страница успешно добавлена', $result['message']);
+        $this->assertEquals('url_added', $result['status']);
         $this->assertEquals('10', $result['urlId']);
 
         Carbon::setTestNow(null);
@@ -52,8 +51,7 @@ class UrlServiceTest extends TestCase
     {
         $result = $this->urlService->addUrl('');
 
-        $this->assertEquals('warning', $result['key']);
-        $this->assertEquals('URL не должен быть пустым', $result['message']);
+        $this->assertEquals('url_required', $result['status']);
         $this->assertNull($result['urlId']);
     }
 
@@ -61,8 +59,7 @@ class UrlServiceTest extends TestCase
     {
         $result = $this->urlService->addUrl('wrong-url');
 
-        $this->assertEquals('warning', $result['key']);
-        $this->assertEquals('Некорректный URL', $result['message']);
+        $this->assertEquals('url_invalid', $result['status']);
         $this->assertNull($result['urlId']);
     }
 
@@ -75,8 +72,7 @@ class UrlServiceTest extends TestCase
             . 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $result = $this->urlService->addUrl($url);
 
-        $this->assertEquals('warning', $result['key']);
-        $this->assertEquals('URL превышает 255 символов', $result['message']);
+        $this->assertEquals('url_too_long', $result['status']);
         $this->assertNull($result['urlId']);
     }
 
@@ -95,8 +91,7 @@ class UrlServiceTest extends TestCase
 
         $result = $this->urlService->addUrl('https://example.com/test?key=value');
 
-        $this->assertEquals('warning', $result['key']);
-        $this->assertEquals('Страница уже существует', $result['message']);
-        $this->assertNull($result['urlId']);
+        $this->assertEquals('url_already_exists', $result['status']);
+        $this->assertEquals(5, $result['urlId']);
     }
 }

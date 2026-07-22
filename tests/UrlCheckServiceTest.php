@@ -76,8 +76,7 @@ class UrlCheckServiceTest extends TestCase
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('success', $result['key']);
-        $this->assertEquals('Страница успешно проверена', $result['message']);
+        $this->assertEquals('check_saved', $result['status']);
 
         Carbon::setTestNow(null);
     }
@@ -101,8 +100,7 @@ class UrlCheckServiceTest extends TestCase
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('danger', $result['key']);
-        $this->assertEquals('Произошла ошибка при проверке, не удалось подключиться', $result['message']);
+        $this->assertEquals('connect_failed', $result['status']);
     }
 
     public function testCheckUrlWhenSaveFails()
@@ -124,7 +122,6 @@ class UrlCheckServiceTest extends TestCase
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('danger', $result['key']);
-        $this->assertEquals('Произошла ошибка, проверка не была сохранена', $result['message']);
+        $this->assertEquals('check_not_saved', $result['status']);
     }
 }

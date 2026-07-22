@@ -90,25 +90,39 @@ class UrlController
         $result = $this->urlService->addUrl($urlName);
         $status = $result['status'];
 
-        if ($status === 'url_already_exists' || $status === 'url_added') {
+        [$type, $message] = match ($status) {
+            'url_already_exists' => ['warning', self::MESSAGE_URL_ALREADY_EXISTS],
+            'url_added' => ['success', self::MESSAGE_URL_ADDED],
+            'url_required' => ['warning', self::MESSAGE_URL_REQUIRED],
+            'url_invalid' => ['warning', self::MESSAGE_URL_INVALID],
+            'url_too_long' => ['warning', self::MESSAGE_URL_TOO_LONG],
+            default => throw new \InvalidArgumentException("Unknown status: $status")
+        };
+
+        $error = [
+            self::MESSAGE_URL_REQUIRED,
+            self::MESSAGE_URL_INVALID,
+            self::MESSAGE_URL_TOO_LONG
+        ];
+        $success = [
+            self::MESSAGE_URL_ALREADY_EXISTS,
+            self::MESSAGE_URL_ADDED
+        ];
+
+        if (in_array($message, $success)) {
             $urlId = $result['urlId'];
-            if ($status === 'url_already_exists') {
-                $this->messages->addMessage('warning', self::MESSAGE_URL_ALREADY_EXISTS);
-            }
-            if ($status === 'url_added') {
-                $this->messages->addMessage('success', self::MESSAGE_URL_ADDED);
-            }
+            $this->messages->addMessage($type, $message);
             return $response->withHeader(
                 'Location',
                 $this->routeParser->urlFor('urls.id', ['id' => $urlId])
             )->withStatus(302);
         }
 
-        if ($status === 'url_required' || $status === 'url_invalid' || $status === 'url_too_long') {
+        if (in_array($message, $error)) {
             $this->renderer->setLayout('layout.phtml');
             $params = [
                 'routeParser' => $this->routeParser,
-                'error' => 
+                'error' => ['key' => $type, 'message' => $message]
             ];
             return $this->renderer->render(
                 $response->withStatus(422),
@@ -137,37 +151,35 @@ class UrlController
         return $response->withStatus(404);
     }
 
-    public function storeCheck(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function check(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $urlId = $args['url_id'];
         $checkResult = $this->urlCheckService->checkUrl($urlId);
-        $key = $checkResult['key'];
-        $message = $checkResult['message'];
+        $status = $checkResult['status'];
 
-        if ($key === 'success') {
-            $this->messages->addMessage($key, $message);
-            return $response->withHeader(
-                'Location',
-                $this->routeParser->urlFor('urls.id', ['id' => $urlId])
-            )->withStatus(302);
-        }
+        [$type, $message] = match ($status) {
+            'connect_failed' => ['danger', self::MESSAGE_CONNECT_FAILED],
+            'check_saved' => ['success', self::MESSAGE_CHECK_SAVED],
+            'check_not_saved' => ['danger', self::MESSAGE_CHECK_NOT_SAVED],
+            default => throw new \InvalidArgumentException("Unknown status: $status")
+        };
 
-        if ($key === 'warning' || $key === 'danger') {
-            $url = $this->urlService->getUrlById($urlId);
-            $this->setLayoutWithtAttributes([
-                'routeParser' => $this->routeParser,
-                'error' => $message
-            ]);
-            $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
-            $params = [
-                'url' => $url,
-                'checks' => $checks
-            ];
-            return $this->renderer->render(
-                $response->withStatus(422),
-                'urls/show.phtml',
-                $params
-            );
-        }
+        $url = $this->urlService->getUrlById($urlId);
+        $this->setLayoutWithtAttributes([
+            'routeParser' => $this->routeParser,
+            'error' => ['key' => $type, 'message' => $message]
+        ]);
+        $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
+        $params = [
+            'url' => $url,
+            'checks' => $checks
+        ];
+        return $this->renderer->render(
+            $response = $type === 'success'
+                ? $response->withStatus(200)
+                : $response->withStatus(422),
+            'urls/show.phtml',
+            $params
+        );
     }
 }

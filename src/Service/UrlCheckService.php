@@ -32,8 +32,8 @@ class UrlCheckService
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             return [
-                'key' => 'danger',
-                'message' => self::MESSAGE_CONNECT_FAILED,
+                'status' => 'connect_failed',
+                'urlId' => null
             ];
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $response = $e->getResponse();
@@ -63,13 +63,13 @@ class UrlCheckService
 
         if ($this->urlCheckRepository->save($urlCheck)) {
             return [
-                'key' => 'success',
-                'message' => self::MESSAGE_CHECK_SAVED,
+                'status' => 'check_saved',
+                'urlId' => null
             ];
         }
         return [
-            'key' => 'danger',
-            'message' => self::MESSAGE_CHECK_NOT_SAVED,
+            'status' => 'check_not_saved',
+            'urlId' => null
         ];
     }
 
