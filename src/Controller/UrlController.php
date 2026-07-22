@@ -170,10 +170,6 @@ class UrlController
             'error' => ['key' => $type, 'message' => $message]
         ]);
         $checks = $this->urlCheckService->getAllChecksOfSpecificUrlId($urlId);
-        $params = [
-            'url' => $url,
-            'checks' => $checks
-        ];
 
         $this->messages->addMessage($type, $message);
 
