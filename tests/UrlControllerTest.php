@@ -195,6 +195,11 @@ class UrlControllerTest extends TestCase
 
     public function testCheck()
     {
+        $this->routeParser
+            ->expects($this->once())
+            ->method('urlFor')
+            ->with('urls.id', ['id' => 10])
+            ->willReturn('/urls/10');
         $this->urlCheckService
             ->expects($this->once())
             ->method('checkUrl')
@@ -216,7 +221,7 @@ class UrlControllerTest extends TestCase
 
         $result = $this->urlController->check($this->request, $this->response, ['url_id' => 10]);
 
-        $this->assertEquals(200, $result->getStatusCode());
-        $this->assertStringContainsString('Страница успешно проверена', $result->getBody());
+        $this->assertEquals(302, $result->getStatusCode());
+        $this->assertEquals('/urls/10', $result->getHeaderLine('Location'));
     }
 }

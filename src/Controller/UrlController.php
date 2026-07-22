@@ -174,12 +174,12 @@ class UrlController
             'url' => $url,
             'checks' => $checks
         ];
-        return $this->renderer->render(
-            $response = $type === 'success'
-                ? $response->withStatus(200)
-                : $response->withStatus(422),
-            'urls/show.phtml',
-            $params
-        );
+
+        $this->messages->addMessage($type, $message);
+
+        return $response->withHeader(
+            'Location',
+            $this->routeParser->urlFor('urls.id', ['id' => $urlId])
+        )->withStatus(302);
     }
 }

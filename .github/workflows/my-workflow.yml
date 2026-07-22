@@ -39,6 +39,9 @@ jobs:
       - name: migration
         run: make db-init
 
+      - name: coverage
+        run: make test-coverage
+
       - name: linter
         run: make lint
 
