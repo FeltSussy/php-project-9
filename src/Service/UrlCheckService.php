@@ -11,10 +11,6 @@ use Carbon\Carbon;
 
 class UrlCheckService
 {
-    private const MESSAGE_CONNECT_FAILED = 'Произошла ошибка при проверке, не удалось подключиться';
-    private const MESSAGE_CHECK_SAVED = 'Страница успешно проверена';
-    private const MESSAGE_CHECK_NOT_SAVED = 'Произошла ошибка, проверка не была сохранена';
-
     private UrlCheckRepository $urlCheckRepository;
     private UrlRepository $urlRepository;
     private Client $client;

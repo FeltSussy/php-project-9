@@ -9,12 +9,6 @@ use Carbon\Carbon;
 
 class UrlService
 {
-    private const MESSAGE_URL_REQUIRED = 'URL не должен быть пустым';
-    private const MESSAGE_URL_INVALID = 'Некорректный URL';
-    private const MESSAGE_URL_TOO_LONG = 'URL превышает 255 символов';
-    private const MESSAGE_URL_ALREADY_EXISTS = 'Страница уже существует';
-    private const MESSAGE_URL_ADDED = 'Страница успешно добавлена';
-
     private UrlRepository $repository;
 
     public function __construct(
@@ -30,23 +24,22 @@ class UrlService
 
         $validator
             ->rule('required', 'urlName')
-            ->message(self::MESSAGE_URL_REQUIRED);
+            ->message('url_required');
 
         $validator
             ->rule('url', 'urlName')
-            ->message(self::MESSAGE_URL_INVALID);
+            ->message('url_invalid');
 
         $validator
             ->rule('lengthMax', 'urlName', 255)
-            ->message(self::MESSAGE_URL_TOO_LONG);
+            ->message('url_too_long');
 
         if (!$validator->validate()) {
             $errors = $validator->errors('urlName');
 
             return [
-                'key' => 'warning',
-                'message' => $errors[0],
-                'urlId' => null,
+                'status' => $errors[0],
+                'urlId' => null
             ];
         }
 
@@ -54,17 +47,15 @@ class UrlService
         $urlNameToSave = $parsedUrlName['scheme'] . "://" . $parsedUrlName['host'];
 
         $url = Url::create($urlNameToSave, Carbon::now());
-        if ($this->repository->findByName($url->getName())) {
+        if ($existingUrl = $this->repository->findByName($url->getName())) {
             return [
-                'key' => 'warning',
-                'message' => self::MESSAGE_URL_ALREADY_EXISTS,
-                'urlId' => null,
+                'status' => 'url_already_exists',
+                'urlId' => $existingUrl->getId(),
             ];
         }
         $this->repository->save($url);
         return [
-            'key' => 'success',
-            'message' => self::MESSAGE_URL_ADDED,
+            'status' => 'url_added',
             'urlId' => $this->repository->getLastInsertId(),
         ];
     }

@@ -12,6 +12,15 @@ use App\Service\UrlCheckService;
 
 class UrlController
 {
+    private const MESSAGE_URL_REQUIRED = 'URL не должен быть пустым';
+    private const MESSAGE_URL_INVALID = 'Некорректный URL';
+    private const MESSAGE_URL_TOO_LONG = 'URL превышает 255 символов';
+    private const MESSAGE_URL_ALREADY_EXISTS = 'Страница уже существует';
+    private const MESSAGE_URL_ADDED = 'Страница успешно добавлена';
+    private const MESSAGE_CONNECT_FAILED = 'Произошла ошибка при проверке, не удалось подключиться';
+    private const MESSAGE_CHECK_SAVED = 'Страница успешно проверена';
+    private const MESSAGE_CHECK_NOT_SAVED = 'Произошла ошибка, проверка не была сохранена';
+
     private PhpRenderer $renderer;
     private Messages $messages;
     private RouteParser $routeParser;
@@ -79,24 +88,27 @@ class UrlController
             : '';
 
         $result = $this->urlService->addUrl($urlName);
+        $status = $result['status'];
 
-        $key = $result['key'];
-        $message = $result['message'];
-        $urlId = $result['urlId'];
-
-        if ($key === 'success') {
-            $this->messages->addMessage($key, $message);
+        if ($status === 'url_already_exists' || $status === 'url_added') {
+            $urlId = $result['urlId'];
+            if ($status === 'url_already_exists') {
+                $this->messages->addMessage('warning', self::MESSAGE_URL_ALREADY_EXISTS);
+            }
+            if ($status === 'url_added') {
+                $this->messages->addMessage('success', self::MESSAGE_URL_ADDED);
+            }
             return $response->withHeader(
                 'Location',
                 $this->routeParser->urlFor('urls.id', ['id' => $urlId])
             )->withStatus(302);
         }
 
-        if ($key === 'warning' || $key === 'danger') {
+        if ($status === 'url_required' || $status === 'url_invalid' || $status === 'url_too_long') {
             $this->renderer->setLayout('layout.phtml');
             $params = [
                 'routeParser' => $this->routeParser,
-                'error' => $message
+                'error' => 
             ];
             return $this->renderer->render(
                 $response->withStatus(422),
