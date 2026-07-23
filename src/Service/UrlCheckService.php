@@ -36,7 +36,7 @@ class UrlCheckService
                 'status' => 'connect_failed',
                 'urlId' => null
             ];
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
             error_log(get_class($e));
             error_log('Status: ' . $e->getResponse()?->getStatusCode());
             $response = $e->getResponse();
