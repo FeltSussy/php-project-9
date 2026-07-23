@@ -29,14 +29,16 @@ class UrlCheckService
     {
         $url = $this->urlRepository->findById($urlId);
         try {
-            error_log('Checking: ' . $url->getName());
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
+            error_log($response->getStatusCode());
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             return [
                 'status' => 'connect_failed',
                 'urlId' => null
             ];
         } catch (\GuzzleHttp\Exception\RequestException $e) {
+            error_log(get_class($e));
+            error_log('Status: ' . $e->getResponse()?->getStatusCode());
             $response = $e->getResponse();
         }
 
