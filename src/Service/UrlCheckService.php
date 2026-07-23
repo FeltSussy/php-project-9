@@ -29,6 +29,7 @@ class UrlCheckService
     {
         $url = $this->urlRepository->findById($urlId);
         try {
+            error_log('Checking: ' . $url->getName());
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             return [
