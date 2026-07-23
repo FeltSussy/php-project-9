@@ -8,6 +8,9 @@ use App\Entity\UrlCheck;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 
 class UrlCheckService
 {
@@ -31,12 +34,12 @@ class UrlCheckService
         try {
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
             error_log($response->getStatusCode());
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+        } catch (ConnectException | ServerException $e) {
             return [
                 'status' => 'connect_failed',
                 'urlId' => null
             ];
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
+        } catch (RequestException $e) {
             error_log(get_class($e));
             error_log('Status: ' . $e->getResponse()?->getStatusCode());
             $response = $e->getResponse();
