@@ -33,6 +33,7 @@ class UrlCheckService
         $url = $this->urlRepository->findById($urlId);
         try {
             $response = $this->client->get($url->getName(), ['timeout' => 15]);
+            error_log('Status: ' . $response->getStatusCode());
         } catch (ConnectException | ServerException $e) {
             return [
                 'status' => 'connect_failed',
