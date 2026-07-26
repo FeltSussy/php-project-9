@@ -54,7 +54,7 @@ $container->set(PDO::class, function () use ($databaseUrl) {
  * Slim App
  */
 $app = AppFactory::createFromContainer($container);
-$app->addErrorMiddleware(true, true, true);
+$app->addErrorMiddleware(false, true, true);
 $container->set(RouteParser::class, function () use ($app) {
     return $app->getRouteCollector()->getRouteParser();
 });
