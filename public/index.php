@@ -11,6 +11,10 @@ use Slim\Flash\Messages;
 use Slim\Routing\RouteParser;
 use Slim\Views\PhpRenderer;
 use GuzzleHttp\Client;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Http\Interfaces\ResponseInterface;
+use Slim\Http\ServerRequest;
 
 session_start();
 /**
@@ -27,9 +31,6 @@ $databaseUrl = parse_url($_ENV['DATABASE_URL']);
  * DI Container
  */
 $container = new Container();
-$container->set(PhpRenderer::class, function () {
-    return new PhpRenderer(__DIR__ . '/../templates');
-});
 $container->set(Messages::class, function () {
     return new Messages();
 });
@@ -54,42 +55,54 @@ $container->set(PDO::class, function () use ($databaseUrl) {
  * Slim App
  */
 $app = AppFactory::createFromContainer($container);
-$app->addErrorMiddleware(false, true, true);
+$app->addErrorMiddleware(true, true, true)
+    ->setDefaultErrorHandler(function (
+        ServerRequest $request,
+        Throwable $exception,
+    ) use ($app, $container): ResponseInterface
+    {
+        $response = $app->getResponseFactory()->createResponse();
+
+        $status = $exception instanceof HttpNotFoundException ? 404 : 500;
+        $template = $status === 404
+            ? 'errors/404.phtml'
+            : 'errors/500.phtml';
+
+        return $container->get(PhpRenderer::class)->render(
+            $response->withStatus($status),
+            $template
+        );
+    });
 $container->set(RouteParser::class, function () use ($app) {
     return $app->getRouteCollector()->getRouteParser();
+});
+$container->set(PhpRenderer::class, function (Container $container) {
+    $renderer = new PhpRenderer(__DIR__ . '/../templates');
+
+    $renderer->setAttributes([
+        'routeParser' => $container->get(RouteParser::class),
+        'flash'  => $container->get(Messages::class)->getMessages()
+    ]);
+
+    return $renderer;
 });
 
 $app->get('/', [UrlController::class, 'home'])
     ->setName('root');
 
 $app->get('/urls/new', [UrlController::class, 'create'])
-    ->setName('urls.new');
+    ->setName('index');
 
 $app->post('/urls', [UrlController::class, 'store'])
-    ->setName('urls');
+    ->setName('urls.store');
 
-$app->get('/urls', [UrlController::class, 'index'])
-    ->setName('urls.index');
+$app->get('/urls', [UrlController::class, 'list'])
+    ->setName('urls.list');
 
-$app->get('/urls/{id}', [UrlController::class, 'show'])
-    ->setName('urls.id');
+$app->get('/urls/{id:\d+}', [UrlController::class, 'show'])
+    ->setName('urls.show');
 
-$app->post('/urls/{url_id}/checks', [UrlController::class, 'check'])
-    ->setName('urls.id.checks');
+$app->post('/urls/{url_id:\d+}/checks', [UrlController::class, 'check'])
+    ->setName('urls.show.checks');
 
 $app->run();
-
-
-// index() — список;
-
-// create() — показать форму создания;
-
-// store() — сохранить;
-
-// show() — показать один объект;
-
-// edit() — показать форму редактирования;
-
-// update() — обновить;
-
-// destroy() — удалить

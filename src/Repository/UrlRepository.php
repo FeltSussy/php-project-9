@@ -15,19 +15,17 @@ class UrlRepository
         $this->pdo = $pdo;
     }
 
-    public function save(Url $url): bool
+    public function save(string $name): bool
     {
+        $url = new Url($name)->setCreatedAt(Carbon::now());
+
         $sql = "INSERT INTO urls (name, created_at) VALUES (:name, :created_at)";
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'name' => $url->getName(),
-                'created_at' => $url->getCreatedAt()->format('Y-m-d H:i:s'),
-            ]);
-            return true;
-        } catch (\Throwable $e) {
-            return false;
-        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'name' => $url->getName(),
+            'created_at' => $url->getCreatedAt()->format('Y-m-d H:i:s'),
+        ]);
+        return true;
     }
 
     public function findByName(string $name): Url|bool
@@ -36,11 +34,9 @@ class UrlRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['name' => $name]);
         if ($url = $stmt->fetch()) {
-            return Url::createFromDatabase(
-                $url['id'],
-                $url['name'],
-                Carbon::parse($url['created_at'])
-            );
+            return new Url($url['name'])
+            ->setId($url['id'])
+            ->setCreatedAt(Carbon::parse($url['created_at']));
         }
         return false;
     }
@@ -51,11 +47,9 @@ class UrlRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
         if ($url = $stmt->fetch()) {
-            return Url::createFromDatabase(
-                $url['id'],
-                $url['name'],
-                Carbon::parse($url['created_at'])
-            );
+            return new Url($url['name'])
+            ->setId($url['id'])
+            ->setCreatedAt(Carbon::parse($url['created_at']));
         }
         return false;
     }
@@ -66,11 +60,9 @@ class UrlRepository
         $sql = "SELECT * FROM urls ORDER BY created_at DESC";
         $stmt = $this->pdo->query($sql);
         while ($url = $stmt->fetch()) {
-            $result[] = Url::createFromDatabase(
-                $url['id'],
-                $url['name'],
-                Carbon::parse($url['created_at'])
-            );
+            $result[] = new Url($url['name'])
+            ->setId($url['id'])
+            ->setCreatedAt(Carbon::parse($url['created_at']));
         }
         return $result;
     }

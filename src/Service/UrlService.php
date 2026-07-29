@@ -17,59 +17,17 @@ class UrlService
         $this->repository = $repository;
     }
 
-    public function addUrl(string $name): array
+    public function addUrl(string $name): Url|bool
     {
-        $validator = new Validator(['urlName' => $name]);
-        $validator->stopOnFirstFail();
-
-        $validator
-            ->rule('required', 'urlName')
-            ->message('url_required');
-
-        $validator
-            ->rule('url', 'urlName')
-            ->message('url_invalid');
-
-        $validator
-            ->rule('lengthMax', 'urlName', 255)
-            ->message('url_too_long');
-
-        if (!$validator->validate()) {
-            $errors = $validator->errors('urlName');
-
-            return [
-                'status' => $errors[0],
-                'urlId' => null
-            ];
-        }
-
         $parsed = parse_url($name);
         $urlNameToSave = $parsed['scheme']
             . '://'
             . $parsed['host']
             . (isset($parsed['port']) ? ':' . $parsed['port'] : '');
 
-        $url = Url::create($urlNameToSave, Carbon::now());
-        if ($existingUrl = $this->repository->findByName($url->getName())) {
-            return [
-                'status' => 'url_already_exists',
-                'urlId' => $existingUrl->getId(),
-            ];
+        if ($existingUrl = $this->repository->findByName($urlNameToSave)) {
+            return $existingUrl;
         }
-        $this->repository->save($url);
-        return [
-            'status' => 'url_added',
-            'urlId' => $this->repository->getLastInsertId(),
-        ];
-    }
-
-    public function getAllUrls()
-    {
-        return $this->repository->getAll();
-    }
-
-    public function getUrlById(int $urlId)
-    {
-        return $this->repository->findById($urlId);
+        return $this->repository->save($urlNameToSave);
     }
 }

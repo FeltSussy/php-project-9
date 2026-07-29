@@ -11,28 +11,9 @@ class Url
     private DateTimeInterface $createdAt;
 
     public function __construct(
-        ?int $id,
         string $name,
-        DateTimeInterface $createdAt
     ) {
-        $this->id = $id;
         $this->name = $name;
-        $this->createdAt = $createdAt;
-    }
-
-    public static function create(
-        string $name,
-        DateTimeInterface $createdAt
-    ): self {
-        return new self(null, $name, $createdAt);
-    }
-
-    public static function createFromDatabase(
-        int $id,
-        string $name,
-        DateTimeInterface $createdAt
-    ): self {
-        return new self($id, $name, $createdAt);
     }
 
     public function getId(): int
@@ -40,9 +21,11 @@ class Url
         return $this->id;
     }
 
-    public function setId(int $id): void
+    public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): string
@@ -50,9 +33,11 @@ class Url
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface
@@ -60,8 +45,10 @@ class Url
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt): void
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
     }
 }

@@ -15,44 +15,17 @@ class UrlCheck
     private DateTimeInterface $createdAt;
 
     public function __construct(
-        ?int $id,
         int $urlId,
         ?int $statusCode,
         ?string $h1,
         ?string $title,
-        ?string $description,
-        DateTimeInterface $createdAt
+        ?string $description
     ) {
-        $this->id = $id;
         $this->urlId = $urlId;
         $this->statusCode = $statusCode;
         $this->h1 = $h1;
         $this->title = $title;
         $this->description = $description;
-        $this->createdAt = $createdAt;
-    }
-
-    public static function create(
-        int $urlId,
-        ?int $statusCode,
-        ?string $h1,
-        ?string $title,
-        ?string $description,
-        DateTimeInterface $createdAt
-    ): self {
-        return new self(null, $urlId, $statusCode, $h1, $title, $description, $createdAt);
-    }
-
-    public static function createFromDatabase(
-        int $id,
-        int $urlId,
-        ?int $statusCode,
-        ?string $h1,
-        ?string $title,
-        ?string $description,
-        DateTimeInterface $createdAt
-    ): self {
-        return new self($id, $urlId, $statusCode, $h1, $title, $description, $createdAt);
     }
 
     public function getId(): ?int
@@ -60,9 +33,11 @@ class UrlCheck
         return $this->id;
     }
 
-    public function setId(int $id): void
+    public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getUrlId(): int
@@ -70,9 +45,11 @@ class UrlCheck
         return $this->urlId;
     }
 
-    public function setUrlId(int $urlId): void
+    public function setUrlId(int $urlId): self
     {
         $this->urlId = $urlId;
+
+        return $this;
     }
 
     public function getStatusCode(): ?int
@@ -80,9 +57,11 @@ class UrlCheck
         return $this->statusCode;
     }
 
-    public function setStatusCode(int $statusCode): void
+    public function setStatusCode(int $statusCode): self
     {
         $this->statusCode = $statusCode;
+
+        return $this;
     }
 
     public function getH1(): ?string
@@ -90,9 +69,11 @@ class UrlCheck
         return $this->h1;
     }
 
-    public function setH1(?string $h1): void
+    public function setH1(?string $h1): self
     {
         $this->h1 = $h1;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -100,9 +81,11 @@ class UrlCheck
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -110,9 +93,11 @@ class UrlCheck
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface
@@ -120,8 +105,10 @@ class UrlCheck
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt): void
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
     }
 }

@@ -15,26 +15,32 @@ class UrlCheckRepository
         $this->pdo = $pdo;
     }
 
-    public function save(UrlCheck $urlCheck): bool
+    public function save(int $urlId, string $statusCode, string $h1, string $title, string $description): bool
     {
+        $urlCheck = new UrlCheck(
+            $urlId,
+            $statusCode,
+            $h1,
+            $title,
+            $description
+            )
+        ->setCreatedAt(Carbon::now());
+
         $sql = "INSERT INTO url_checks (
             url_id, status_code, h1, title, description, created_at)
             VALUES (
             :urlId, :statusCode, :h1, :title, :description, :createdAt)";
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                'urlId' => $urlCheck->getUrlId(),
-                'statusCode' => $urlCheck->getStatusCode(),
-                'h1' => $urlCheck->getH1(),
-                'title' => $urlCheck->getTitle(),
-                'description' => $urlCheck->getDescription(),
-                'createdAt' => $urlCheck->getCreatedAt()->format('Y-m-d H:i:s')
-            ]);
-            return true;
-        } catch (\Throwable $e) {
-            return false;
-        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'urlId' => $urlCheck->getUrlId(),
+            'statusCode' => (int) $urlCheck->getStatusCode(),
+            'h1' => $urlCheck->getH1(),
+            'title' => $urlCheck->getTitle(),
+            'description' => $urlCheck->getDescription(),
+            'createdAt' => $urlCheck->getCreatedAt()->format('Y-m-d H:i:s')
+        ]);
+        return true;
     }
 
     public function findById(int $checkId): UrlCheck|bool
@@ -43,14 +49,15 @@ class UrlCheckRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $checkId]);
         if ($check = $stmt->fetch()) {
-            return UrlCheck::createFromDatabase(
-                $check['id'],
+            return new UrlCheck(
                 $check['url_id'],
                 $check['status_code'],
                 $check['h1'],
                 $check['title'],
-                $check['description'],
-                Carbon::parse($check['created_at'])
+                $check['description']
+                )
+                ->setId($check['id'])
+                ->setCreatedAt(Carbon::parse($check['created_at'])
             );
         }
         return false;
@@ -63,37 +70,45 @@ class UrlCheckRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['url_id' => $urlId]);
         while ($check = $stmt->fetch()) {
-            $result[] = UrlCheck::createFromDatabase(
-                $check['id'],
+            $result[] = new UrlCheck(
                 $check['url_id'],
                 $check['status_code'],
                 $check['h1'],
                 $check['title'],
-                $check['description'],
-                Carbon::parse($check['created_at'])
+                $check['description']
+                )
+                ->setId($check['id'])
+                ->setCreatedAt(Carbon::parse($check['created_at'])
             );
         }
         return $result;
     }
 
-    public function findLatestForEachUrl(): array
+    public function findLatestByUrlId(int $urlId): UrlCheck|bool
     {
-        $result = [];
         $sql = "SELECT DISTINCT ON (url_id) *
                 FROM url_checks
+                WHERE url_id = :url_id
                 ORDER BY url_id, created_at DESC";
-        $stmt = $this->pdo->query($sql);
-        while ($check = $stmt->fetch()) {
-            $result[$check['url_id']] = UrlCheck::createFromDatabase(
-                $check['id'],
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['url_id' => $urlId]);
+        if ($check = $stmt->fetch()) {
+            return new UrlCheck(
                 $check['url_id'],
                 $check['status_code'],
                 $check['h1'],
                 $check['title'],
-                $check['description'],
-                Carbon::parse($check['created_at'])
+                $check['description']
+                )
+                ->setId($check['id'])
+                ->setCreatedAt(Carbon::parse($check['created_at'])
             );
         }
-        return $result;
+        return false;
+    }
+
+    public function getLastInsertId(): string|bool
+    {
+        return $this->pdo->lastInsertId();
     }
 }

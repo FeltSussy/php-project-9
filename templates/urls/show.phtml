@@ -1,25 +1,25 @@
-<h1 class="display-5">Сайт: <?= htmlspecialchars($url->getName()) ?></h1>
+<h1 class="display-5">Сайт: <?= e($url->getName()) ?></h1>
 <table class="table table-bordered" data-test="url">
     <thead>
         <tr>
             <th scope="col">ID</th>
-            <th scope="col"><?= htmlspecialchars($url->getId()) ?></th>
+            <th scope="col"><?= e($url->getId()) ?></th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <th scope="row">Имя</th>
-            <td><?= htmlspecialchars($url->getName()) ?></td>
+            <td><?= e($url->getName()) ?></td>
         </tr>
         <tr>
             <th scope="row">Дата создания</th>
-            <td><?= htmlspecialchars($url->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
+            <td><?= e($url->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
         </tr>
     </tbody>
 </table>
 <br>
 <h1 class="display-5">Проверки</h1>
-<form method="post" action="<?= htmlspecialchars($routeParser->urlFor('urls.id.checks', ['url_id' => $url->getId()])) ?>">
+<form method="post" action="<?= e($routeParser->urlFor('urls.show.checks', ['url_id' => $url->getId()])) ?>">
     <input class="btn btn-primary" type="submit" value="Запустить проверку">
 </form>
 <table class="table table-bordered" data-test="checks">
@@ -34,14 +34,14 @@
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($checks as $index => $check) : ?>
+        <?php foreach ($checks as $check) : ?>
         <tr>
-            <td><?= $index + 1 ?></td>
-            <td><?= htmlspecialchars((string) $check->getStatusCode()) ?></td>
-            <td><?= truncate(htmlspecialchars($check->getH1() ?? ''), 200) ?></td>
-            <td><?= truncate(htmlspecialchars($check->getTitle() ?? ''), 200) ?></td>
-            <td><?= truncate(htmlspecialchars($check->getDescription() ?? ''), 200) ?></td>
-            <td><?= htmlspecialchars($check->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
+            <td><?= e($check->getId()) ?></td>
+            <td><?= e((string) $check->getStatusCode()) ?></td>
+            <td><?= truncate(e($check->getH1() ?? ''), 200) ?></td>
+            <td><?= truncate(e($check->getTitle() ?? ''), 200) ?></td>
+            <td><?= truncate(e($check->getDescription() ?? ''), 200) ?></td>
+            <td><?= e($check->getCreatedAt()->format('Y-m-d H:i:s')) ?></td>
         </tr>
         <?php endforeach ?>
     </tbody>

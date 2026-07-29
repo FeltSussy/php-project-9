@@ -10,3 +10,8 @@ function truncate(?string $text, int $length = 200): string
         ? mb_substr($text, 0, $length) . '...'
         : $text;
 }
+
+function e(string $string): string
+{
+    return htmlspecialchars($string);
+}
