@@ -23,7 +23,7 @@ class UrlController
     private const string MESSAGE_URL_ALREADY_EXISTS = 'Страница уже существует';
     private const string MESSAGE_URL_ADDED = 'Страница успешно добавлена';
     private const string MESSAGE_CHECK_SAVED = 'Страница успешно проверена';
-    private const string MESSAGE_CHECK_NOT_SAVED = 'Произошла ошибка при проверке';
+    private const string MESSAGE_CHECK_NOT_SAVED = 'Произошла ошибка при проверке, не удалось подключиться';
     private const string ALERT_WARNING = 'warning';
     private const string ALERT_DANGER = 'danger';
     private const string ALERT_SUCCESS = 'success';
