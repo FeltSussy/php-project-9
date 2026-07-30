@@ -151,7 +151,6 @@ class UrlController
 
         if ($url = $this->urlRepository->findById($urlId)) {
             $this->setLayout();
-            ;
             $params = [
                 'url' => $url,
                 'checks' => $this->urlCheckRepository->findAllByUrlId($urlId)
