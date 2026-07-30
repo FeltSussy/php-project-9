@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use App\Entity\Url;
+use App\Entity\UrlCheck;
 use App\Repository\UrlRepository;
 use App\Service\UrlService;
 use Carbon\Carbon;
@@ -30,59 +31,21 @@ class UrlServiceTest extends TestCase
         $this->repository
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (Url $url) {
-                return $url->getName() === 'https://example.com'
-                    && $url->getCreatedAt()->format('Y-m-d H:i:s') === '2024-03-09 16:00:00';
-            }))
+            ->with('https://example.com')
             ->willReturn(true);
-        $this->repository
-            ->method('getLastInsertId')
-            ->willReturn('10');
 
         $result = $this->urlService->addUrl('https://example.com/test?key=value');
 
-        $this->assertEquals('url_added', $result['status']);
-        $this->assertEquals('10', $result['urlId']);
+        $this->assertTrue($result);
 
         Carbon::setTestNow(null);
     }
 
-    public function testAddUrlWithEmptyName()
+    public function testAddUrlWithExistingName()
     {
-        $result = $this->urlService->addUrl('');
-
-        $this->assertEquals('url_required', $result['status']);
-        $this->assertNull($result['urlId']);
-    }
-
-    public function testAddUrlWithWrongName()
-    {
-        $result = $this->urlService->addUrl('wrong-url');
-
-        $this->assertEquals('url_invalid', $result['status']);
-        $this->assertNull($result['urlId']);
-    }
-
-    public function testAddUrlWithNameExceeding255Chars()
-    {
-        $url = 'https://example.com/'
-            . 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            . 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            . 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            . 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-        $result = $this->urlService->addUrl($url);
-
-        $this->assertEquals('url_too_long', $result['status']);
-        $this->assertNull($result['urlId']);
-    }
-
-    public function testAddUrlWithExistingUrl()
-    {
-        $url = new Url(
-            5,
-            'https://example.com',
-            Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00')
-        );
+        $url = new Url('https://example.com')
+            ->setCreatedAt(Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00'))
+            ->setId(5);
 
         $this->repository
             ->method('findByName')
@@ -91,7 +54,6 @@ class UrlServiceTest extends TestCase
 
         $result = $this->urlService->addUrl('https://example.com/test?key=value');
 
-        $this->assertEquals('url_already_exists', $result['status']);
-        $this->assertEquals(5, $result['urlId']);
+        $this->assertInstanceOf(Url::class, $result);
     }
 }

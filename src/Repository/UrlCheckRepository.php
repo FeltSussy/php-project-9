@@ -15,15 +15,20 @@ class UrlCheckRepository
         $this->pdo = $pdo;
     }
 
-    public function save(int $urlId, string $statusCode, string $h1, string $title, string $description): bool
-    {
+    public function save(
+        int $urlId,
+        ?int $statusCode = null,
+        ?string $h1 = null,
+        ?string $title = null,
+        ?string $description = null
+    ): bool {
         $urlCheck = new UrlCheck(
             $urlId,
             $statusCode,
             $h1,
             $title,
             $description
-            )
+        )
         ->setCreatedAt(Carbon::now());
 
         $sql = "INSERT INTO url_checks (
@@ -55,10 +60,9 @@ class UrlCheckRepository
                 $check['h1'],
                 $check['title'],
                 $check['description']
-                )
+            )
                 ->setId($check['id'])
-                ->setCreatedAt(Carbon::parse($check['created_at'])
-            );
+                ->setCreatedAt(Carbon::parse($check['created_at']));
         }
         return false;
     }
@@ -76,10 +80,9 @@ class UrlCheckRepository
                 $check['h1'],
                 $check['title'],
                 $check['description']
-                )
+            )
                 ->setId($check['id'])
-                ->setCreatedAt(Carbon::parse($check['created_at'])
-            );
+                ->setCreatedAt(Carbon::parse($check['created_at']));
         }
         return $result;
     }
@@ -99,10 +102,9 @@ class UrlCheckRepository
                 $check['h1'],
                 $check['title'],
                 $check['description']
-                )
+            )
                 ->setId($check['id'])
-                ->setCreatedAt(Carbon::parse($check['created_at'])
-            );
+                ->setCreatedAt(Carbon::parse($check['created_at']));
         }
         return false;
     }

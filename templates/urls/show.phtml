@@ -37,7 +37,7 @@
         <?php foreach ($checks as $check) : ?>
         <tr>
             <td><?= e($check->getId()) ?></td>
-            <td><?= e((string) $check->getStatusCode()) ?></td>
+            <td><?= e((string) $check->getStatusCode()) ?? '' ?></td>
             <td><?= truncate(e($check->getH1() ?? ''), 200) ?></td>
             <td><?= truncate(e($check->getTitle() ?? ''), 200) ?></td>
             <td><?= truncate(e($check->getDescription() ?? ''), 200) ?></td>

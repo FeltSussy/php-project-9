@@ -132,13 +132,13 @@ class UrlController
 
         $addUrlResult = $this->urlService->addUrl($urlName);
 
-            if ($addUrlResult instanceof Url) {
-                $urlId = $addUrlResult->getId();
-                $this->messages->addMessage(self::ALERT_WARNING, self::MESSAGE_URL_ALREADY_EXISTS);
-            } else {
-                $urlId = $this->urlRepository->getLastInsertId();
-                $this->messages->addMessage(self::ALERT_SUCCESS, self::MESSAGE_URL_ADDED);
-            }
+        if ($addUrlResult instanceof Url) {
+            $urlId = $addUrlResult->getId();
+            $this->messages->addMessage(self::ALERT_WARNING, self::MESSAGE_URL_ALREADY_EXISTS);
+        } else {
+            $urlId = $this->urlRepository->getLastInsertId();
+            $this->messages->addMessage(self::ALERT_SUCCESS, self::MESSAGE_URL_ADDED);
+        }
             return $response->withHeader(
                 'Location',
                 $this->routeParser->urlFor('urls.show', ['id' => $urlId])
@@ -150,7 +150,8 @@ class UrlController
         $urlId = (int) $args['id'];
 
         if ($url = $this->urlRepository->findById($urlId)) {
-            $this->setLayout();;
+            $this->setLayout();
+            ;
             $params = [
                 'url' => $url,
                 'checks' => $this->urlCheckRepository->findAllByUrlId($urlId)

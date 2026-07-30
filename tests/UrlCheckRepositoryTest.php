@@ -34,26 +34,35 @@ class UrlCheckRepositoryTest extends TestCase
         $this->pdo->exec('DROP TABLE IF EXISTS url_checks');
         $this->pdo->exec('DROP TABLE IF EXISTS urls');
         $this->pdo->exec($schema);
+        $this->pdo->exec("INSERT INTO urls (name, created_at) VALUES ('https://example.com', '2024-03-09 16:00:00')");
+        $this->pdo->exec("INSERT INTO urls (name, created_at) VALUES ('https://example2.com', '2024-03-09 16:00:10')");
 
         $this->repository = new UrlCheckRepository($this->pdo);
     }
 
     public function testSave()
     {
-        $urlCheck = UrlCheck::create(
-            10,
+        $urlCheck = new UrlCheck(
+            1,
             200,
             'testH1',
             'testTitle',
-            'testDescription',
-            Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00')
+            'testDescription'
+        )
+        ->setId(1);
+
+        $result = $this->repository->save(
+            $urlCheck->getUrlId(),
+            $urlCheck->getStatusCode(),
+            $urlCheck->getH1(),
+            $urlCheck->getTitle(),
+            $urlCheck->getDescription()
         );
 
-        $result = $this->repository->save($urlCheck);
         $savedCheck = $this->repository->findById(1);
 
         $this->assertTrue($result);
-        $this->assertEquals(10, $savedCheck->getUrlId());
+        $this->assertEquals(1, $savedCheck->getUrlId());
         $this->assertEquals(200, $savedCheck->getStatusCode());
     }
 
@@ -62,12 +71,12 @@ class UrlCheckRepositoryTest extends TestCase
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (10, 200, 'testH1', 'testTitle', 'testDescription', '2024-03-09 16:00:00')");
+            (1, 200, 'testH1', 'testTitle', 'testDescription', '2024-03-09 16:00:00')");
 
         $result = $this->repository->findById(1);
 
         $this->assertEquals(1, $result->getId());
-        $this->assertEquals(10, $result->getUrlId());
+        $this->assertEquals(1, $result->getUrlId());
         $this->assertEquals('testH1', $result->getH1());
     }
 
@@ -76,38 +85,40 @@ class UrlCheckRepositoryTest extends TestCase
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (10, 200, 'firstH1', 'firstTitle', 'firstDescription', '2024-03-09 16:00:00')");
+            (1, 200, 'firstH1', 'firstTitle', 'firstDescription', '2024-03-09 16:00:00')");
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (10, 201, 'secondH1', 'secondTitle', 'secondDescription', '2024-03-10 16:00:10')");
+            (1, 201, 'secondH1', 'secondTitle', 'secondDescription', '2024-03-10 16:00:10')");
 
-        $result = $this->repository->findAllByUrlId(10);
+        $result = $this->repository->findAllByUrlId(1);
 
         $this->assertCount(2, $result);
         $this->assertEquals('secondH1', $result[0]->getH1());
         $this->assertEquals('firstH1', $result[1]->getH1());
     }
 
-    public function testFindLatestForEachUrl()
+    public function testFindLatestByUrlId()
     {
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (10, 200, 'firstH1', 'firstTitle', 'firstDescription', '2024-03-09 16:00:00')");
+            (1, 200, 'firstH1', 'firstTitle', 'firstDescription', '2024-03-09 16:00:00')");
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (10, 404, 'secondH1', 'secondTitle', 'secondDescription', '2024-03-10 16:00:10')");
+            (1, 404, 'secondH1', 'secondTitle', 'secondDescription', '2024-03-10 16:00:10')");
         $this->pdo->exec("INSERT INTO url_checks
             (url_id, status_code, h1, title, description, created_at)
             VALUES
-            (20, 500, 'otherH1', 'otherTitle', 'otherDescription', '2024-03-11 16:00:10')");
+            (2, 500, 'otherH1', 'otherTitle', 'otherDescription', '2024-03-11 16:00:10')");
 
-        $result = $this->repository->findLatestForEachUrl();
+        $result = $this->repository->findLatestByUrlId(1);
 
-        $this->assertCount(2, $result);
-        $this->assertEquals('secondH1', $result[10]->getH1());
-        $this->assertEquals('otherH1', $result[20]->getH1());
+        $this->assertEquals('secondH1', $result->getH1());
+
+        $result = $this->repository->findLatestByUrlId(2);
+
+        $this->assertEquals('otherH1', $result->getH1());
     }
 }

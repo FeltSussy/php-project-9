@@ -3,9 +3,7 @@
 namespace App\Service;
 
 use App\Repository\UrlRepository;
-use Valitron\Validator;
 use App\Entity\Url;
-use Carbon\Carbon;
 
 class UrlService
 {

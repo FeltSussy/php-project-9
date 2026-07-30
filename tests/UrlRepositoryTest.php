@@ -40,15 +40,14 @@ class UrlRepositoryTest extends TestCase
 
     public function testSave()
     {
-        $url = Url::create(
-            'https://example.com',
-            Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00')
-        );
+        $url = new Url('https://example.com')
+            ->setCreatedAt(Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 16:00:00'));
 
-        $result = $this->repository->save($url);
+        $result = $this->repository->save($url->getName());
         $savedUrl = $this->repository->findByName('https://example.com');
 
         $this->assertTrue($result);
+
         $this->assertEquals('https://example.com', $savedUrl->getName());
     }
 

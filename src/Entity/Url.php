@@ -6,13 +6,12 @@ use DateTimeInterface;
 
 class Url
 {
-    private ?int $id;
+    private int $id;
     private string $name;
     private DateTimeInterface $createdAt;
 
-    public function __construct(
-        string $name,
-    ) {
+    public function __construct(string $name)
+    {
         $this->name = $name;
     }
 

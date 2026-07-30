@@ -6,7 +6,7 @@ use DateTimeInterface;
 
 class UrlCheck
 {
-    private ?int $id;
+    private int $id;
     private int $urlId;
     private ?int $statusCode;
     private ?string $h1;

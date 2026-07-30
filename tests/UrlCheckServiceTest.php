@@ -40,11 +40,11 @@ class UrlCheckServiceTest extends TestCase
         $this->urlRepository
             ->method('findById')
             ->with(10)
-            ->willReturn(new Url(
-                10,
-                'https://example.com',
-                Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00')
-            ));
+            ->willReturn(
+                new Url('https://example.com')
+                    ->setId(10)
+                    ->setCreatedAt(Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00'))
+            );
         $this->client
             ->method('get')
             ->with('https://example.com', ['timeout' => 15])
@@ -64,19 +64,18 @@ class UrlCheckServiceTest extends TestCase
         $this->urlCheckRepository
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (UrlCheck $urlCheck) {
-                return $urlCheck->getUrlId() === 10
-                    && $urlCheck->getStatusCode() === 200
-                    && $urlCheck->getH1() === 'Test h1'
-                    && $urlCheck->getTitle() === 'Test title'
-                    && $urlCheck->getDescription() === 'Test description'
-                    && $urlCheck->getCreatedAt()->format('Y-m-d H:i:s') === '2024-03-09 16:00:00';
-            }))
+            ->with(
+                10,
+                200,
+                'Test h1',
+                'Test title',
+                'Test description',
+            )
             ->willReturn(true);
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('check_saved', $result['status']);
+        $this->assertTrue($result);
 
         Carbon::setTestNow(null);
     }
@@ -86,11 +85,10 @@ class UrlCheckServiceTest extends TestCase
         $this->urlRepository
             ->method('findById')
             ->with(10)
-            ->willReturn(new Url(
-                10,
-                'https://example.com',
-                Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00')
-            ));
+            ->willReturn(new Url('https://example.com')
+                ->setId(10)
+                ->setCreatedAt(Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00'))
+            );
         $this->client
             ->method('get')
             ->willThrowException(new ConnectException(
@@ -100,7 +98,7 @@ class UrlCheckServiceTest extends TestCase
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('connect_failed', $result['status']);
+        $this->assertFalse($result);
     }
 
     public function testCheckUrlWhenSaveFails()
@@ -108,11 +106,10 @@ class UrlCheckServiceTest extends TestCase
         $this->urlRepository
             ->method('findById')
             ->with(10)
-            ->willReturn(new Url(
-                10,
-                'https://example.com',
-                Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00')
-            ));
+            ->willReturn(new Url('https://example.com')
+                ->setId(10)
+                ->setCreatedAt(Carbon::createFromFormat('Y-m-d H:i:s', '2024-03-09 15:00:00'))
+            );
         $this->client
             ->method('get')
             ->willReturn(new Response(200, [], '<html></html>'));
@@ -122,6 +119,6 @@ class UrlCheckServiceTest extends TestCase
 
         $result = $this->urlCheckService->checkUrl(10);
 
-        $this->assertEquals('check_not_saved', $result['status']);
+        $this->assertFalse($result);
     }
 }
