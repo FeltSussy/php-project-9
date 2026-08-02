@@ -11,9 +11,9 @@
     <tbody>
         <?php foreach ($urls as $url) : ?>
         <tr>
-            <th scope="row"><?= e($url->getId()) ?></th>
+            <th scope="row"><?= $url->getId() ?></th>
             <td>
-                <a href="<?= e($routeParser->urlFor('urls.show', ['id' => $url->getId()])) ?>">
+                <a href="<?= $routeParser->urlFor('urls.show', ['id' => $url->getId()]) ?>">
                     <?= e($url->getName()) ?>
                 </a>
             </td>

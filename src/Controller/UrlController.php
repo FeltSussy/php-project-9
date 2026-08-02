@@ -74,7 +74,7 @@ class UrlController
         return $this->renderer->render($response, 'index.phtml', $params);
     }
 
-    public function list(ServerRequestInterface $request, ResponseInterface $response)
+    public function index(ServerRequestInterface $request, ResponseInterface $response)
     {
         $this->setLayout();
         $allUrls = $this->urlRepository->getAll();
@@ -91,7 +91,7 @@ class UrlController
             'urls' => $allUrls,
             'lastChecks' => $latestChecksByUrlId
         ];
-        return $this->renderer->render($response, 'urls/list.phtml', $params);
+        return $this->renderer->render($response, 'urls/index.phtml', $params);
     }
 
     public function store(ServerRequestInterface $request, ResponseInterface $response)

@@ -55,12 +55,13 @@ $container->set(PDO::class, function () use ($databaseUrl) {
  * Slim App
  */
 $app = AppFactory::createFromContainer($container);
-$app->addErrorMiddleware(true, true, true)
+$app->addErrorMiddleware(false, true, true)
     ->setDefaultErrorHandler(function (
         ServerRequest $request,
         Throwable $exception,
     ) use ($app, $container): ResponseInterface
     {
+        $container->get(PhpRenderer::class)->setLayout('layouts/layout.phtml');
         $response = $app->getResponseFactory()->createResponse();
 
         $status = $exception instanceof HttpNotFoundException ? 404 : 500;
@@ -73,6 +74,10 @@ $app->addErrorMiddleware(true, true, true)
             $template
         );
     });
+
+/**
+ * DI Container
+ */
 $container->set(RouteParser::class, function () use ($app) {
     return $app->getRouteCollector()->getRouteParser();
 });
@@ -96,8 +101,8 @@ $app->get('/urls/new', [UrlController::class, 'create'])
 $app->post('/urls', [UrlController::class, 'store'])
     ->setName('urls.store');
 
-$app->get('/urls', [UrlController::class, 'list'])
-    ->setName('urls.list');
+$app->get('/urls', [UrlController::class, 'index'])
+    ->setName('urls.index');
 
 $app->get('/urls/{id:\d+}', [UrlController::class, 'show'])
     ->setName('urls.show');

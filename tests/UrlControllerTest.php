@@ -78,7 +78,7 @@ class UrlControllerTest extends TestCase
         $this->assertStringContainsString("id=\"add-url-form\"", $result->getBody());
     }
 
-    public function testList()
+    public function testIndex()
     {
         $this->urlRepository
             ->method('getAll')
@@ -101,7 +101,7 @@ class UrlControllerTest extends TestCase
                 ->setId(1)
             );
 
-        $result = $this->urlController->list($this->request, $this->response);
+        $result = $this->urlController->index($this->request, $this->response);
 
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertStringContainsString('2024-03-09 16:00:10', $result->getBody());
