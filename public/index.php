@@ -21,14 +21,11 @@ session_start();
  * Environment
  */
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/..");
-$dotenv->load();
-if (!isset($_ENV['DATABASE_URL'])) {
-    throw new \RuntimeException('DATABASE_URL is not defined');
-}
-$databaseUrl = parse_url($_ENV['DATABASE_URL']);
+$dotenv->safeLoad();
+$databaseConfig = getDatabaseConfig($_ENV['DATABASE_URL'] ?? null);
 
 /**
- * DI Container
+ * DI Container and Slim App
  */
 $container = new Container();
 $container->set(Messages::class, function () {
@@ -37,31 +34,43 @@ $container->set(Messages::class, function () {
 $container->set(Client::class, function () {
     return new Client();
 });
-$container->set(PDO::class, function () use ($databaseUrl) {
+$container->set(PDO::class, function () use ($databaseConfig) {
     return new PDO(
         sprintf(
             'pgsql:host=%s;port=%d;dbname=%s',
-            $databaseUrl['host'],
-            $databaseUrl['port'] ?? 5432,
-            ltrim($databaseUrl['path'], '/')
+            $databaseConfig['host'],
+            $databaseConfig['port'],
+            $databaseConfig['name']
         ),
-        $databaseUrl['user'],
-        $databaseUrl['pass'],
+        $databaseConfig['user'],
+        $databaseConfig['password'],
         [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
     );
 });
 
-/**
- * Slim App
- */
 $app = AppFactory::createFromContainer($container);
+
+$container->set(RouteParser::class, function () use ($app) {
+    return $app->getRouteCollector()->getRouteParser();
+});
+$container->set(PhpRenderer::class, function (Container $container) {
+    $renderer = new PhpRenderer(__DIR__ . '/../templates');
+    $renderer->setLayout('layouts/layout.phtml');
+
+    $renderer->setAttributes([
+        'routeParser' => $container->get(RouteParser::class),
+        'flash'  => $container->get(Messages::class)->getMessages()
+    ]);
+
+    return $renderer;
+});
+
 $app->addErrorMiddleware(false, true, true)
     ->setDefaultErrorHandler(function (
         ServerRequest $request,
         Throwable $exception,
     ) use ($app, $container): ResponseInterface
     {
-        $container->get(PhpRenderer::class)->setLayout('layouts/layout.phtml');
         $response = $app->getResponseFactory()->createResponse();
 
         $status = $exception instanceof HttpNotFoundException ? 404 : 500;
@@ -76,22 +85,8 @@ $app->addErrorMiddleware(false, true, true)
     });
 
 /**
- * DI Container
+ * Routes
  */
-$container->set(RouteParser::class, function () use ($app) {
-    return $app->getRouteCollector()->getRouteParser();
-});
-$container->set(PhpRenderer::class, function (Container $container) {
-    $renderer = new PhpRenderer(__DIR__ . '/../templates');
-
-    $renderer->setAttributes([
-        'routeParser' => $container->get(RouteParser::class),
-        'flash'  => $container->get(Messages::class)->getMessages()
-    ]);
-
-    return $renderer;
-});
-
 $app->get('/', [UrlController::class, 'home'])
     ->setName('root');
 

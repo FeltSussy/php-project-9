@@ -109,6 +109,27 @@ class UrlCheckRepository
         return false;
     }
 
+    public function findLatestChecks(): array
+    {
+        $result = [];
+        $sql = "SELECT DISTINCT ON (url_id) *
+                FROM url_checks
+                ORDER BY url_id, created_at DESC";
+        $stmt = $this->pdo->query($sql);
+        while ($check = $stmt->fetch()) {
+            $result[] = new UrlCheck(
+                $check['url_id'],
+                $check['status_code'],
+                $check['h1'],
+                $check['title'],
+                $check['description']
+            )
+                ->setId($check['id'])
+                ->setCreatedAt(Carbon::parse($check['created_at']));
+        }
+        return $result;
+    }
+
     public function getLastInsertId(): string|bool
     {
         return $this->pdo->lastInsertId();

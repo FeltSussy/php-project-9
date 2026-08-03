@@ -3,19 +3,19 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/..");
-$dotenv->load();
+$dotenv->safeLoad();
 
-$databaseUrl = parse_url($_ENV['DATABASE_URL']);
+$databaseConfig = getDatabaseConfig($_ENV['DATABASE_URL'] ?? null);
 
 $pdo = new PDO(
         sprintf(
             'pgsql:host=%s;port=%d;dbname=%s',
-            $databaseUrl['host'],
-            $databaseUrl['port'] ?? 5432,
-            ltrim($databaseUrl['path'], '/')
+            $databaseConfig['host'],
+            $databaseConfig['port'],
+            $databaseConfig['name']
         ),
-        $databaseUrl['user'],
-        $databaseUrl['pass'],
+        $databaseConfig['user'],
+        $databaseConfig['password'],
         [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
 );
 

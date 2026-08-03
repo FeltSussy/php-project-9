@@ -3,7 +3,6 @@
 namespace App\Tests;
 
 use App\Entity\Url;
-use App\Entity\UrlCheck;
 use App\Repository\UrlCheckRepository;
 use App\Repository\UrlRepository;
 use App\Service\UrlCheckService;
@@ -23,6 +22,7 @@ class UrlCheckServiceTest extends TestCase
 
     public function setUp(): void
     {
+        Carbon::setTestNow('2024-03-09 16:00:00');
         $this->urlCheckRepository = $this->createMock(UrlCheckRepository::class);
         $this->urlRepository = $this->createMock(UrlRepository::class);
         $this->client = $this->createMock(Client::class);
@@ -33,10 +33,13 @@ class UrlCheckServiceTest extends TestCase
         );
     }
 
+    public function tearDown(): void
+    {
+        Carbon::setTestNow(null);
+    }
+
     public function testCheckUrl()
     {
-        Carbon::setTestNow('2024-03-09 16:00:00');
-
         $this->urlRepository
             ->method('findById')
             ->with(10)
@@ -76,8 +79,6 @@ class UrlCheckServiceTest extends TestCase
         $result = $this->urlCheckService->checkUrl(10);
 
         $this->assertTrue($result);
-
-        Carbon::setTestNow(null);
     }
 
     public function testCheckUrlWithConnectError()

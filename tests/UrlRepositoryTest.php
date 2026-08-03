@@ -17,23 +17,24 @@ class UrlRepositoryTest extends TestCase
     public function setUp(): void
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
-        $dotenv->load();
-        $databaseUrl = parse_url($_ENV['DATABASE_URL']);
+        $dotenv->safeLoad();
+        $databaseConfig = getDatabaseConfig($_ENV['DATABASE_URL'] ?? null);
         $this->pdo = new PDO(
             sprintf(
                 'pgsql:host=%s;port=%d;dbname=%s',
-                $databaseUrl['host'],
-                $databaseUrl['port'] ?? 5432,
-                ltrim($databaseUrl['path'], '/')
+                $databaseConfig['host'],
+                $databaseConfig['port'],
+                $databaseConfig['name']
             ),
-            $databaseUrl['user'],
-            $databaseUrl['pass'],
+            $databaseConfig['user'],
+            $databaseConfig['password'],
             [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
         );
-        $schema = file_get_contents(__DIR__ . '/../database.sql');
-        $this->pdo->exec('DROP TABLE IF EXISTS url_checks');
-        $this->pdo->exec('DROP TABLE IF EXISTS urls');
-        $this->pdo->exec($schema);
+        $this->pdo->exec("CREATE TEMP TABLE urls (
+            id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            name VARCHAR(255) UNIQUE NOT NULL,
+            created_at TIMESTAMP NOT NULL
+        )");
 
         $this->repository = new UrlRepository($this->pdo);
     }
