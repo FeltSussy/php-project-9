@@ -127,7 +127,7 @@ class UrlController
         $urlId = (int) $args['url_id'];
 
         if (!$this->urlCheckService->checkUrl($urlId)) {
-            $params = $this->urlService->getUrl((int) $urlId);
+            $params = $this->urlService->getUrl($urlId);
             $params['errors'] = ['messages' => ['message' => self::MESSAGE_CHECK_NOT_SAVED]];
             $params['alertType'] = self::ALERT_DANGER;
             return $this->renderer->render($response->withStatus(500), 'urls/show.phtml', $params);
@@ -136,7 +136,7 @@ class UrlController
         $this->messages->addMessage(self::ALERT_SUCCESS, self::MESSAGE_CHECK_SAVED);
         return $response->withHeader(
             'Location',
-            $this->routeParser->urlFor('urls.show', ['id' => $urlId])
+            $this->routeParser->urlFor('urls.show', ['id' => (string) $urlId])
         )->withStatus(302);
     }
 }
