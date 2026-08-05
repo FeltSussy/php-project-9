@@ -87,22 +87,16 @@ $app->addErrorMiddleware(false, true, true)
 /**
  * Routes
  */
-$app->get('/', [UrlController::class, 'home'])
-    ->setName('root');
+$app->get('/', [UrlController::class, 'home'])->setName('root');
 
-$app->get('/urls/new', [UrlController::class, 'create'])
-    ->setName('index');
+$app->get('/urls/new', [UrlController::class, 'create'])->setName('index');
 
-$app->post('/urls', [UrlController::class, 'store'])
-    ->setName('urls.store');
+$app->post('/urls', [UrlController::class, 'store'])->setName('urls.store');
 
-$app->get('/urls', [UrlController::class, 'index'])
-    ->setName('urls.index');
+$app->get('/urls', [UrlController::class, 'index'])->setName('urls.index');
 
-$app->get('/urls/{id:\d+}', [UrlController::class, 'show'])
-    ->setName('urls.show');
+$app->get('/urls/{id:\d+}', [UrlController::class, 'show'])->setName('urls.show');
 
-$app->post('/urls/{url_id:\d+}/checks', [UrlController::class, 'check'])
-    ->setName('urls.show.checks');
+$app->post('/urls/{url_id:\d+}/checks', [UrlController::class, 'check'])->setName('urls.show.checks');
 
 $app->run();

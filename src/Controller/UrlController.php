@@ -124,7 +124,7 @@ class UrlController
 
     public function check(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $urlId = $args['url_id'];
+        $urlId = (int) $args['url_id'];
 
         if (!$this->urlCheckService->checkUrl($urlId)) {
             $params = $this->urlService->getUrl((int) $urlId);
